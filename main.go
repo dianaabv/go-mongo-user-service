@@ -2,26 +2,31 @@ package main
 
 import (
 	"context"
-	"database/sql"
+	// "database/sql"
 	"flag"
 	"fmt"
-
 	_ "github.com/lib/pq"
-
 	"github.com/go-kit/kit/log"
-
 	"github.com/go-kit/kit/log/level"
-
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
-
 	"gokit-example/account"
+	"go.mongodb.org/mongo-driver/mongo"
+    // "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const dbsource = "postgresql://postgres:postgres@localhost:5432/gokitexample?sslmode=disable"
-
+const (
+	dbsource = "mongodb://localhost:27017"
+	dbsourcewithcred = "mongodb://admin:abc123@localhost:27017"
+	hosts      = "localhost:27017"
+	database   = "buddyApp"
+	username   = "admin"
+	password   = "abc123"
+	collection = "goUsers"
+)
 func main() {
 	var httpAddr = flag.String("http", ":8080", "http listen address")
 	var logger log.Logger
@@ -38,22 +43,35 @@ func main() {
 	level.Info(logger).Log("msg", "service started")
 	defer level.Info(logger).Log("msg", "service ended")
 
-	var db *sql.DB
-	{
-		var err error
+	clientOptions := options.Client().ApplyURI(dbsource)
 
-		db, err = sql.Open("postgres", dbsource)
-		if err != nil {
-			level.Error(logger).Log("exit", err)
-			os.Exit(-1)
-		}
+    // Connect to MongoDB 
+    db, err := mongo.Connect(context.TODO(), clientOptions)
 
+    if err != nil {
+	    level.Error(logger).Log("exit", err)
 	}
 
+	err = db.Ping(context.TODO(), nil)
+	if err != nil {
+		level.Error(logger).Log("exit", err)
+	}
+	// var db *mongo.Client
+	// {
+	// 	var err error
+	// 	clientOptions := options.Client().ApplyURI("mongodb://admin:abc123@localhost:27017")
+	// 	db, err := mongo.Connect(context.TODO(), clientOptions)
+	// 	fmt.Println("db", db)
+
+	// 	if err != nil {
+	// 	 	level.Error(logger).Log("exit", err)
+	// 	 	os.Exit(-1)
+	// 	}
+	// }
 	flag.Parse()
 	ctx := context.Background()
 	var srv account.Service
-	{
+	{	
 		repository := account.NewRepo(db, logger)
 
 		srv = account.NewService(repository, logger)
@@ -77,3 +95,13 @@ func main() {
 
 	level.Error(logger).Log("exit", <-errs)
 }
+
+
+//db.createUser({user:"adminName",pwd:"1234",roles: [{role:"readWrite", db: "dataBaseName"}], mechanisms: ["SCRAM-SHA-1"]})
+// use admin
+// db.createUser({
+//     user:"admin",
+//     pwd:"abc123",
+//     roles:[{role:"userAdminAnyDatabase",db:"admin"}],
+//     passwordDigestor:"server"
+// })

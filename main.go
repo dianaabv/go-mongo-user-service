@@ -18,6 +18,7 @@ import (
     "go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// TO-DO os.Getenv
 const (
 	dbsource = "mongodb://localhost:27017"
 	dbsourcewithcred = "mongodb://admin:abc123@localhost:27017"

@@ -38,11 +38,25 @@ func hashAndSalt(pwd []byte) string {
     // than the MinCost (4)
     hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
     if err != nil {
-		fmt.Println("Inserted a Single Document: ", err)
+		return "Hash Problem"
+		// fmt.Println("Inserted a Single Document: ", err)
     }
     // GenerateFromPassword returns a byte slice so we need to
     // convert the bytes to a string and return it
     return string(hash)
+}
+
+// use for login later 
+func comparePasswords(hashedPwd string, plainPwd []byte) bool {
+    // Since we'll be getting the hashed password from the DB it
+    // will be a string so we'll need to convert it to a byte slice
+    byteHash := []byte(hashedPwd)
+    err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+    if err != nil {
+        return false
+    }
+    
+    return true
 }
 
 func (repo *repo) CreateUser(ctx context.Context, user User) error {
@@ -71,4 +85,18 @@ func (repo *repo) GetUser(ctx context.Context, id string) (string, error) {
 
 	// return email, nil
 	return email, nil
+}
+
+
+func (repo *repo) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {
+	// var email string
+	var token string
+	
+	// err := repo.db.QueryRow("SELECT email FROM users WHERE id=$1", id).Scan(&email)
+	// if err != nil {
+	// 	return "", RepoErr
+	// }
+
+	// return email, nil
+	return email, token, nil
 }

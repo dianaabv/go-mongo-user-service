@@ -23,6 +23,16 @@ type (
 	GetUserResponse struct {
 		Email string `json:"email"`
 	}
+
+	CreateUserLoginRequest struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	CreateUserLoginResponse struct {
+		Email string `json:"email"`
+		Token string `json:"token"`
+		Ok bool `json:"ok"`
+	}
 )
 
 
@@ -49,3 +59,12 @@ func decodeEmailReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
+func decodeUserLoginReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req CreateUserLoginRequest
+	vars := mux.Vars(r)
+	req = CreateUserLoginRequest{
+		Email: vars["email"],
+		Password: vars["password"],
+	}
+    return req, nil
+}

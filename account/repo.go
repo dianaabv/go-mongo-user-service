@@ -3,6 +3,7 @@ package account
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson"
 	// "go.mongodb.org/mongo-driver/mongo/options"
 	"errors"
 	"fmt"
@@ -67,6 +68,7 @@ func (repo *repo) CreateUser(ctx context.Context, user User) error {
 	// user.Password = hashAndSalt([]byte(user.Password))
 	pwd := hashAndSalt([]byte(user.Password))
 	user.Password = pwd
+	fmt.Println("user", user)
 	insertResult, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
         return err
@@ -89,14 +91,19 @@ func (repo *repo) GetUser(ctx context.Context, id string) (string, error) {
 
 
 func (repo *repo) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {
-	// var email string
+	var user User
 	var token string
-	
-	// err := repo.db.QueryRow("SELECT email FROM users WHERE id=$1", id).Scan(&email)
-	// if err != nil {
-	// 	return "", RepoErr
-	// }
-
-	// return email, nil
+	fmt.Println("findResult1", email, password)
+	if email == "" || password == "" {
+		return email, token, RepoErr
+	}
+	filter := bson.M{
+		"email": email,
+	}
+	fmt.Println("filter", filter)
+	collection := repo.db.Database(database).Collection(collection)
+	documentReturned := collection.FindOne(context.Background(), filter)
+	documentReturned.Decode(&user)
+	fmt.Println("findResult1111", user)
 	return email, token, nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
+	// "fmt"
 )
 
 type Endpoints struct {
@@ -42,6 +43,7 @@ func makeGetUserEndpoint(s Service) endpoint.Endpoint {
 func makeGetUserLoginEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateUserLoginRequest)
+		// fmt.Println(req)
 		email, token, err := s.GetUserLogin(ctx, req.Email, req.Password)
 
 		return CreateUserLoginResponse{

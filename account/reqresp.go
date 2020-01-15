@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	// "fmt"
 )
 
 type (
@@ -61,10 +62,10 @@ func decodeEmailReq(ctx context.Context, r *http.Request) (interface{}, error) {
 
 func decodeUserLoginReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req CreateUserLoginRequest
-	vars := mux.Vars(r)
-	req = CreateUserLoginRequest{
-		Email: vars["email"],
-		Password: vars["password"],
+	// super important line
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, err
 	}
-    return req, nil
+	return req, nil
 }

@@ -133,27 +133,14 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 		},
 	}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	// TO-DO env variable
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
-		fmt.Println(error)
+		// something went wrong
+		return email, "", nil
 	}
 
 	fmt.Println("tokenString", tokenString)
-	// tk := Token{
-	// 	UserID: user.ID,
-	// 	Name:   user.Name,
-	// 	Email:  user.Email,
-	// 	StandardClaims: &jwt.StandardClaims{
-	// 		ExpiresAt: expiresAt,
-	// 	},
-	// }
-
-
-
-	// token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-
-	// tk := user.Token{
-	// }
-	// tk := &models.Token{}
-	return email, "", nil
+    // succesful login
+	return email, tokenString, nil
 }

@@ -59,14 +59,12 @@ func (s service) GetUser(ctx context.Context, id string) (string, error) {
 func (s service) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {
 	logger := log.With(s.logger, "method", "GetUserLogin")
 
-	email, password, err := s.repostory.GetUserLogin(ctx, email, password)
+	email, token, err := s.repostory.GetUserLogin(ctx, email, password)
 
 	if err != nil {
 		level.Error(logger).Log("err", err)
 		return "", "", err
 	}
 
-	// logger.Log("Get user", id)
-
-	return email, "token needed", nil
+	return email, token, nil
 }

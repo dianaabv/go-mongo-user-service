@@ -1,13 +1,21 @@
 package account
 
-import "context"
+import (
+	"context"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
+)
 
 type User struct {
+	gorm.Model
 	ID       string `json:"id,omitempty"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-}
+	// StandardClaims *jwt.StandardClaims 
+	*jwt.StandardClaims
+	// token    string `json:"password, omitempty"`
 
+}
 type Repository interface {
 	CreateUser(ctx context.Context, user User) error
 	GetUser(ctx context.Context, id string) (string, error)

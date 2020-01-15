@@ -7,9 +7,11 @@ import (
 	// "go.mongodb.org/mongo-driver/mongo/options"
 	"errors"
 	"fmt"
-
 	"github.com/go-kit/kit/log"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/dgrijalva/jwt-go"
+	"time"
+	// "reflect"
 )
 
 var RepoErr = errors.New("Unable to handle Repo Request")
@@ -52,7 +54,7 @@ func comparePasswords(hashedPwd string, plainPwd []byte) bool {
     // Since we'll be getting the hashed password from the DB it
     // will be a string so we'll need to convert it to a byte slice
     byteHash := []byte(hashedPwd)
-    err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
     if err != nil {
         return false
     }
@@ -92,18 +94,66 @@ func (repo *repo) GetUser(ctx context.Context, id string) (string, error) {
 
 func (repo *repo) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {
 	var user User
-	var token string
-	fmt.Println("findResult1", email, password)
+	// var token string
 	if email == "" || password == "" {
-		return email, token, RepoErr
+		return email, "", RepoErr
 	}
 	filter := bson.M{
 		"email": email,
 	}
-	fmt.Println("filter", filter)
 	collection := repo.db.Database(database).Collection(collection)
-	documentReturned := collection.FindOne(context.Background(), filter)
-	documentReturned.Decode(&user)
-	fmt.Println("findResult1111", user)
-	return email, token, nil
+	err := collection.FindOne(context.Background(), filter).Decode(&user)
+	if err != nil {
+		// Email not found
+		return email, "", nil
+	}
+	pwdMatch := comparePasswords(user.Password, []byte(password))
+	if pwdMatch == false {
+		// Invalid login credentials. Please try again
+		return email, "", nil
+	}
+	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
+	// user.StandardClaims = &jwt.StandardClaims{
+	// 	ExpiresAt: expiresAt,
+	// }
+	// tk := User{
+	// 	ID: user.ID,
+	// 	Email:  user.Email,
+	// 	StandardClaims: &jwt.StandardClaims{
+	// 		ExpiresAt: expiresAt,
+	// 	},
+	// }
+
+	tk := User{
+		ID: user.ID,
+		// Name:   user.Name,
+		Email:  user.Email,
+		StandardClaims: &jwt.StandardClaims{
+			ExpiresAt: expiresAt,
+		},
+	}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, error := token.SignedString([]byte("secret"))
+	if error != nil {
+		fmt.Println(error)
+	}
+
+	fmt.Println("tokenString", tokenString)
+	// tk := Token{
+	// 	UserID: user.ID,
+	// 	Name:   user.Name,
+	// 	Email:  user.Email,
+	// 	StandardClaims: &jwt.StandardClaims{
+	// 		ExpiresAt: expiresAt,
+	// 	},
+	// }
+
+
+
+	// token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+
+	// tk := user.Token{
+	// }
+	// tk := &models.Token{}
+	return email, "", nil
 }

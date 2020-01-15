@@ -62,6 +62,7 @@ func decodeEmailReq(ctx context.Context, r *http.Request) (interface{}, error) {
 
 func decodeUserLoginReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req CreateUserLoginRequest
+	// var res CreateUserLoginResponse
 	// super important line
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {

@@ -13,7 +13,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/jinzhu/gorm v1.9.12
 	github.com/lib/pq v1.2.0
-	github.com/pkg/errors v0.9.0 // indirect
+	github.com/pkg/errors v0.9.0
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
 	go.mongodb.org/mongo-driver v1.2.1

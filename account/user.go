@@ -2,19 +2,26 @@ package account
 
 import (
 	"context"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/jinzhu/gorm"
+	jwt "github.com/dgrijalva/jwt-go"
+	// "github.com/jinzhu/gorm"
 )
 
 type User struct {
-	gorm.Model
+	// gorm.Model
 	ID       string `json:"id,omitempty"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	// StandardClaims *jwt.StandardClaims 
-	*jwt.StandardClaims
-	// token    string `json:"password, omitempty"`
+	// *jwt.StandardClaims
+	// token    string `json:"token, omitempty"`
 
+}
+
+//Token struct declaration
+type Token struct {
+	ID string
+	Email  string
+	*jwt.StandardClaims
 }
 type Repository interface {
 	CreateUser(ctx context.Context, user User) error

@@ -113,18 +113,8 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 		return email, "", nil
 	}
 	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
-	// user.StandardClaims = &jwt.StandardClaims{
-	// 	ExpiresAt: expiresAt,
-	// }
-	// tk := User{
-	// 	ID: user.ID,
-	// 	Email:  user.Email,
-	// 	StandardClaims: &jwt.StandardClaims{
-	// 		ExpiresAt: expiresAt,
-	// 	},
-	// }
 
-	tk := User{
+	tk := &Token{
 		ID: user.ID,
 		// Name:   user.Name,
 		Email:  user.Email,

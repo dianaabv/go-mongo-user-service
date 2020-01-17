@@ -2,7 +2,6 @@ package account
 
 import (
 	"context"
-
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/gofrs/uuid"

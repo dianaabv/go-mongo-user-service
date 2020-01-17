@@ -13,6 +13,7 @@ import (
 	"os/signal"
 	"syscall"
 	"gokit-example/account"
+	// "gokit-example/activity"
 	"go.mongodb.org/mongo-driver/mongo"
     // "go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -20,6 +21,7 @@ import (
 
 // TODO os.Getenv
 const (
+	defaultPort = "8080"
 	dbsource = "mongodb://localhost:27017"
 	dbsourcewithcred = "mongodb://admin:abc123@localhost:27017"
 	hosts      = "localhost:27017"
@@ -29,13 +31,13 @@ const (
 	collection = "goUsers"
 )
 func main() {
-	var httpAddr = flag.String("http", ":8080", "http listen address")
+	var httpAddr = flag.String("http", ":" + defaultPort, "http listen address")
 	var logger log.Logger
 	{
 		logger = log.NewLogfmtLogger(os.Stderr)
 		logger = log.NewSyncLogger(logger)
 		logger = log.With(logger,
-			"service", "account",
+			"service", "account", "activity",
 			"time:", log.DefaultTimestampUTC,
 			"caller", log.DefaultCaller,
 		)
@@ -66,6 +68,13 @@ func main() {
 		srv = account.NewService(repository, logger)
 	}
 
+	// var actv activity.Service
+	// {	
+	// 	repository := activity.NewRepo(db, logger)
+
+	// 	actv = activity.NewService(repository, logger)
+	// }
+
 	errs := make(chan error)
 
 	go func() {
@@ -75,6 +84,8 @@ func main() {
 	}()
 
 	endpoints := account.MakeEndpoints(srv)
+	// endpoints := activity.MakeEndpoints(actv)
+
 
 	go func() {
 		fmt.Println("listening on port", *httpAddr)

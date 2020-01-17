@@ -13,12 +13,6 @@ type User struct {
 	*jwt.StandardClaims
 }
 
-//Token struct declaration
-// type Token struct {
-// 	ID string
-// 	Email  string
-// 	*jwt.StandardClaims
-// }
 type Repository interface {
 	CreateUser(ctx context.Context, user User) error
 	GetUser(ctx context.Context, id string) (string, error)

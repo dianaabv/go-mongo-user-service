@@ -80,15 +80,18 @@ func (repo *repo) CreateUser(ctx context.Context, user User) error {
 }
 
 func (repo *repo) GetUser(ctx context.Context, id string) (string, error) {
-	var email string
-	
-	// err := repo.db.QueryRow("SELECT email FROM users WHERE id=$1", id).Scan(&email)
-	// if err != nil {
-	// 	return "", RepoErr
-	// }
-
-	// return email, nil
-	return email, nil
+	var user User
+	fmt.Println("id", id)
+	filter := bson.M{
+		"id": id,
+	}
+	collection := repo.db.Database(database).Collection(collection)
+	err := collection.FindOne(context.Background(), filter).Decode(&user)
+	if err != nil {
+		// Email not found
+		return "", RepoErr
+	}
+	return user.Email, nil
 }
 
 
@@ -116,7 +119,6 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 
 	tk := &Token{
 		ID: user.ID,
-		// Name:   user.Name,
 		Email:  user.Email,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: expiresAt,

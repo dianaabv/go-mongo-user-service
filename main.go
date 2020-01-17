@@ -18,7 +18,7 @@ import (
     "go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TO-DO os.Getenv
+// TODO os.Getenv
 const (
 	dbsource = "mongodb://localhost:27017"
 	dbsourcewithcred = "mongodb://admin:abc123@localhost:27017"
@@ -57,18 +57,6 @@ func main() {
 	if err != nil {
 		level.Error(logger).Log("exit", err)
 	}
-	// var db *mongo.Client
-	// {
-	// 	var err error
-	// 	clientOptions := options.Client().ApplyURI("mongodb://admin:abc123@localhost:27017")
-	// 	db, err := mongo.Connect(context.TODO(), clientOptions)
-	// 	fmt.Println("db", db)
-
-	// 	if err != nil {
-	// 	 	level.Error(logger).Log("exit", err)
-	// 	 	os.Exit(-1)
-	// 	}
-	// }
 	flag.Parse()
 	ctx := context.Background()
 	var srv account.Service

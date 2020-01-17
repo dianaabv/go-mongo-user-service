@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"gokit-example/account/models"
+	// "gokit-example/account/helpers"
 	httptransport "github.com/go-kit/kit/transport/http"
 	jwt "github.com/dgrijalva/jwt-go"
 )

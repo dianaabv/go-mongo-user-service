@@ -7,22 +7,18 @@ import (
 )
 
 type User struct {
-	// gorm.Model
 	ID       string `json:"id,omitempty"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	// StandardClaims *jwt.StandardClaims 
-	// *jwt.StandardClaims
-	// token    string `json:"token, omitempty"`
-
+	*jwt.StandardClaims
 }
 
 //Token struct declaration
-type Token struct {
-	ID string
-	Email  string
-	*jwt.StandardClaims
-}
+// type Token struct {
+// 	ID string
+// 	Email  string
+// 	*jwt.StandardClaims
+// }
 type Repository interface {
 	CreateUser(ctx context.Context, user User) error
 	GetUser(ctx context.Context, id string) (string, error)

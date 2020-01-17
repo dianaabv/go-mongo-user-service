@@ -28,7 +28,7 @@ func JwtVerify(next http.Handler) http.Handler {
 			json.NewEncoder(w).Encode(Exception{Message: "Missing auth token"})
 			return
 		}
-		tk := &Token{}
+		tk := &User{}
 		_, err := jwt.ParseWithClaims(header, tk, func(token *jwt.Token) (interface{}, error) {
 			return []byte("secret"), nil
 		})

@@ -84,13 +84,3 @@ func main() {
 
 	level.Error(logger).Log("exit", <-errs)
 }
-
-
-//db.createUser({user:"adminName",pwd:"1234",roles: [{role:"readWrite", db: "dataBaseName"}], mechanisms: ["SCRAM-SHA-1"]})
-// use admin
-// db.createUser({
-//     user:"admin",
-//     pwd:"abc123",
-//     roles:[{role:"userAdminAnyDatabase",db:"admin"}],
-//     passwordDigestor:"server"
-// })

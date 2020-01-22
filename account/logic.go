@@ -16,7 +16,7 @@ type service struct {
 func NewService(rep Repository, logger log.Logger) Service {
 	return &service{
 		repostory: rep,
-		logger:    logger,
+		logger   : logger,
 	}
 }
 
@@ -41,14 +41,33 @@ func (s service) CreateUser(ctx context.Context, email string, password string) 
 	return "Success", nil
 }
 
+func (s service) UpdateUser(ctx context.Context, id string, email string, password string) (string, error) {
+	logger := log.With(s.logger, "method", "UpdateUser")
+	fmt.Println(id, "im hereeeeeeeeeeeee")
+	user := User{
+		ID:       id,
+		Email:    email,
+		Password: password,
+	}
+	message, err := s.repostory.UpdateUser(ctx, id, user)
+	if err != nil {
+		// fmt.Println(email, message, err, "message")
+		level.Error(logger).Log("err", err)
+		return "", err
+	}
+
+	// logger.Log("Get user", id)
+
+	return message, nil
+}
+
 func (s service) GetUser(ctx context.Context, id string) (string, string, error) {
 	logger := log.With(s.logger, "method", "GetUser")
 
 	email, message, err := s.repostory.GetUser(ctx, id)
-	fmt.Println(email, message, err, "message")
 	if err != nil {
-		fmt.Println("im heeeere")
-		// level.Error(logger).Log("err", err)
+		// fmt.Println(email, message, err, "message")
+		level.Error(logger).Log("err", err)
 		return "", message, err
 	}
 
@@ -59,9 +78,7 @@ func (s service) GetUser(ctx context.Context, id string) (string, string, error)
 
 func (s service) DeleteUser(ctx context.Context, id string) (string, error) {
 	logger := log.With(s.logger, "method", "DeleteUser")
-
-	email, err := s.repostory.DeleteUser(ctx, id)
-
+	res, err := s.repostory.DeleteUser(ctx, id)
 	if err != nil {
 		level.Error(logger).Log("err", err)
 		return "", err
@@ -69,7 +86,7 @@ func (s service) DeleteUser(ctx context.Context, id string) (string, error) {
 
 	logger.Log("Delete user", id)
 
-	return email, nil
+	return res, nil
 }
 
 func (s service) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {

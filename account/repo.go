@@ -45,6 +45,30 @@ func (repo *repo) CreateUser(ctx context.Context, user User) error {
     fmt.Println("Inserted a Single Document: ", insertResult.InsertedID)
 	return nil
 }
+func (repo *repo) UpdateUser(ctx context.Context, id string, user User) (string, error) {
+	if user.Email == "" || user.Password == "" {
+		return "Some info is missing", nil
+	}
+	fmt.Println(id, user.Email, "im hereeeeeeeeeeeee")
+	filter := bson.M{
+		"id": id,
+	}
+	update := bson.M{"$set": bson.M{"email": user.Email}}
+	collection := repo.db.Database(database).Collection(collection)
+	result, err := collection.UpdateOne(
+        ctx,
+        filter,
+        update,
+	)
+	fmt.Println(result, "im hereeeeeeeeeeeee")
+	if err != nil {
+		// Email not found
+		// RepoErr difficult to handle
+		// return "", "User not found", err 
+		return "User not found", nil
+	}
+	return "", nil
+}
 
 func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error) {
 	var user User
@@ -54,10 +78,11 @@ func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error
 	}
 	collection := repo.db.Database(database).Collection(collection)
 	err := collection.FindOne(ctx, filter).Decode(&user)
-	fmt.Println(user, err, "getUser")
 	if err != nil {
 		// Email not found
-		return "", "User not found", RepoErr
+		// RepoErr difficult to handle
+		// return "", "User not found", err 
+		return "", "User not found", nil
 	}
 	return user.Email, "User found", nil
 }

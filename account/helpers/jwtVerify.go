@@ -34,7 +34,6 @@ func JwtVerify(next http.Handler) http.Handler {
 			json.NewEncoder(w).Encode(Exception{Message: err.Error()})
 			return
 		}
-
 		ctx := context.WithValue(r.Context(), "user", tk)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

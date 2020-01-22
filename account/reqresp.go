@@ -21,17 +21,25 @@ type (
 	GetUserRequest struct {
 		Id string `json:"id"`
 	}
-	DeleteUserRequest struct {
-		Id string `json:"id"`
-	}
 	GetUserResponse struct {
 		Message string `json:"message"`
 		Email string `json:"email"`
 	}
+	DeleteUserRequest struct {
+		Id string `json:"id"`
+	}
 	DeleteUserResponse struct {
 		Ok string `json:"ok"`
 	}
-
+	UpdateUserRequest struct {
+		Id string `json:"id"`
+		// User User `json:"user"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	UpdateUserResponse struct {
+		Ok string `json:"ok"`
+	}
 	CreateUserLoginRequest struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -50,6 +58,20 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 
 func decodeUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req CreateUserRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, err
+	}
+	// fmt.Println(req, "req1111111111111")
+	return req, nil
+}
+func decodeUpdateUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req UpdateUserRequest
+	vars := mux.Vars(r)
+
+	req = UpdateUserRequest{
+		Id: vars["id"],
+	}
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		return nil, err

@@ -21,8 +21,15 @@ type (
 	GetUserRequest struct {
 		Id string `json:"id"`
 	}
+	DeleteUserRequest struct {
+		Id string `json:"id"`
+	}
 	GetUserResponse struct {
+		Message string `json:"message"`
 		Email string `json:"email"`
+	}
+	DeleteUserResponse struct {
+		Ok string `json:"ok"`
 	}
 
 	CreateUserLoginRequest struct {

@@ -2,22 +2,23 @@ package account
 
 import (
 	"context"
-
 	"github.com/go-kit/kit/endpoint"
-	// "fmt"
+	"fmt"
 )
 
 type Endpoints struct {
 	CreateUser endpoint.Endpoint
 	GetUser    endpoint.Endpoint
 	UserLogin  endpoint.Endpoint
+	DeleteUser endpoint.Endpoint
 }
 
 func MakeEndpoints(s Service) Endpoints {
 	return Endpoints{
-		CreateUser: makeCreateUserEndpoint(s),
-		GetUser:    makeGetUserEndpoint(s),
-		UserLogin:  makeGetUserLoginEndpoint(s),
+		CreateUser : makeCreateUserEndpoint(s),
+		GetUser    : makeGetUserEndpoint(s),
+		UserLogin  : makeGetUserLoginEndpoint(s),
+		DeleteUser : makeDeleteUserEndpoint(s),
 	}
 }
 
@@ -32,10 +33,22 @@ func makeCreateUserEndpoint(s Service) endpoint.Endpoint {
 func makeGetUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetUserRequest)
-		email, err := s.GetUser(ctx, req.Id)
+		email, message, err := s.GetUser(ctx, req.Id)
 
 		return GetUserResponse{
 			Email: email,
+			Message: message,
+		}, err
+	}
+}
+
+func makeDeleteUserEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(GetUserRequest)
+		Ok, err := s.DeleteUser(ctx, req.Id)
+		fmt.Println(Ok, "ok")
+		return DeleteUserResponse{
+			Ok: Ok,
 		}, err
 	}
 }

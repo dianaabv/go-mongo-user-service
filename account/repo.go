@@ -46,21 +46,35 @@ func (repo *repo) CreateUser(ctx context.Context, user User) error {
 	return nil
 }
 
-func (repo *repo) GetUser(ctx context.Context, id string) (string, error) {
+func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error) {
 	var user User
 	fmt.Println("id", id)
 	filter := bson.M{
 		"id": id,
 	}
 	collection := repo.db.Database(database).Collection(collection)
-	err := collection.FindOne(context.Background(), filter).Decode(&user)
+	err := collection.FindOne(ctx, filter).Decode(&user)
+	fmt.Println(user, err, "getUser")
+	if err != nil {
+		// Email not found
+		return "", "User not found", RepoErr
+	}
+	return user.Email, "User found", nil
+}
+
+func (repo *repo) DeleteUser(ctx context.Context, id string) (string, error) {
+	filter := bson.M{
+		"id": id,
+	}
+	collection := repo.db.Database(database).Collection(collection)
+	res, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		// Email not found
 		return "", RepoErr
 	}
-	return user.Email, nil
+	fmt.Println("res", res)
+	return "Success", nil
 }
-
 
 func (repo *repo) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {
 	var user User

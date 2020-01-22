@@ -91,17 +91,10 @@ func main() {
 		errs <- fmt.Errorf("%s", <-c)
 	}()
 
-	// accountEndpoints := account.MakeEndpoints(srv)
-	// activityEndpoints := activity.MakeEndpoints(actv)
-	
-
 
 	go func() {
 		fmt.Println("listening on port", *httpAddr)
-		// accountHandler := account.NewHTTPServer(ctx, accountEndpoints)
-		// activityHandler := activity.NewHTTPServer(ctx, activityEndpoints)
 		errs <- http.ListenAndServe(*httpAddr, nil)
-		// errs <- http.ListenAndServe(*httpAddr, activityHandler)
 	}()
 
 	level.Error(logger).Log("exit", <-errs)

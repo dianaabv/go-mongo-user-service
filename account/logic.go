@@ -5,6 +5,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
 	"github.com/gofrs/uuid"
+	"fmt"
 )
 
 type service struct {
@@ -40,17 +41,33 @@ func (s service) CreateUser(ctx context.Context, email string, password string) 
 	return "Success", nil
 }
 
-func (s service) GetUser(ctx context.Context, id string) (string, error) {
+func (s service) GetUser(ctx context.Context, id string) (string, string, error) {
 	logger := log.With(s.logger, "method", "GetUser")
 
-	email, err := s.repostory.GetUser(ctx, id)
+	email, message, err := s.repostory.GetUser(ctx, id)
+	fmt.Println(email, message, err, "message")
+	if err != nil {
+		fmt.Println("im heeeere")
+		// level.Error(logger).Log("err", err)
+		return "", message, err
+	}
+
+	logger.Log("Get user", id)
+
+	return email, message, nil
+}
+
+func (s service) DeleteUser(ctx context.Context, id string) (string, error) {
+	logger := log.With(s.logger, "method", "DeleteUser")
+
+	email, err := s.repostory.DeleteUser(ctx, id)
 
 	if err != nil {
 		level.Error(logger).Log("err", err)
 		return "", err
 	}
 
-	logger.Log("Get user", id)
+	logger.Log("Delete user", id)
 
 	return email, nil
 }

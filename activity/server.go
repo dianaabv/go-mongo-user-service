@@ -16,7 +16,7 @@ func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 
-	r.Methods("POST").Path("/createactivity").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/activity/v1/createactivity").Handler(httptransport.NewServer(
 		endpoints.CreateActivity,
 		decodeUserReq,
 		encodeResponse,

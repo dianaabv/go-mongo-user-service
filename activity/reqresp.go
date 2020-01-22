@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	// "github.com/gorilla/mux"
-	// "fmt"
+	"fmt"
 )
 
 type (
@@ -33,6 +33,7 @@ func decodeUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(req)
 	return req, nil
 }
 

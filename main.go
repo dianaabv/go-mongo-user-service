@@ -13,7 +13,7 @@ import (
 	"os/signal"
 	"syscall"
 	"gokit-example/account"
-	// "gokit-example/activity"
+	"gokit-example/activity"
 	"go.mongodb.org/mongo-driver/mongo"
     // "go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -37,7 +37,7 @@ func main() {
 		logger = log.NewLogfmtLogger(os.Stderr)
 		logger = log.NewSyncLogger(logger)
 		logger = log.With(logger,
-			"service", "account", "activity",
+			"service", "account",
 			"time:", log.DefaultTimestampUTC,
 			"caller", log.DefaultCaller,
 		)
@@ -68,13 +68,21 @@ func main() {
 		srv = account.NewService(repository, logger)
 	}
 
-	// var actv activity.Service
-	// {	
-	// 	repository := activity.NewRepo(db, logger)
+	var actv activity.Service
+	{	
+		repository := activity.NewRepo(db, logger)
 
-	// 	actv = activity.NewService(repository, logger)
-	// }
+		actv = activity.NewService(repository, logger)
+	}
 
+
+	mux := http.NewServeMux()
+	// // activity.NewHTTPServer(ctx, activityEndpoints)
+	accountEndpoints := account.MakeEndpoints(srv)
+	activityEndpoints := activity.MakeEndpoints(actv)
+	mux.Handle("/account/v1/", account.NewHTTPServer(ctx, accountEndpoints))
+	mux.Handle("/activity/v1/", activity.NewHTTPServer(ctx, activityEndpoints))
+	http.Handle("/", accessControl(mux))
 	errs := make(chan error)
 
 	go func() {
@@ -83,15 +91,31 @@ func main() {
 		errs <- fmt.Errorf("%s", <-c)
 	}()
 
-	endpoints := account.MakeEndpoints(srv)
-	// endpoints := activity.MakeEndpoints(actv)
+	// accountEndpoints := account.MakeEndpoints(srv)
+	// activityEndpoints := activity.MakeEndpoints(actv)
+	
 
 
 	go func() {
 		fmt.Println("listening on port", *httpAddr)
-		handler := account.NewHTTPServer(ctx, endpoints)
-		errs <- http.ListenAndServe(*httpAddr, handler)
+		// accountHandler := account.NewHTTPServer(ctx, accountEndpoints)
+		// activityHandler := activity.NewHTTPServer(ctx, activityEndpoints)
+		errs <- http.ListenAndServe(*httpAddr, nil)
+		// errs <- http.ListenAndServe(*httpAddr, activityHandler)
 	}()
 
 	level.Error(logger).Log("exit", <-errs)
+}
+func accessControl(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }

@@ -48,7 +48,7 @@ func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
 
-	r.Methods("POST").Path("/user").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/account/v1/user").Handler(httptransport.NewServer(
 		endpoints.CreateUser,
 		decodeUserReq,
 		encodeResponse,
@@ -60,16 +60,17 @@ func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	// 	encodeResponse,
 	// ))
 
-	r.Methods("POST").Path("/login").Handler(httptransport.NewServer(
+	r.Methods("POST").Path("/account/v1/login").Handler(httptransport.NewServer(
 		endpoints.UserLogin,
 		decodeUserLoginReq,
 		encodeResponse,
 	))
 	
 	// Auth route
-	s := r.PathPrefix("/auth").Subrouter()
+	s := r.PathPrefix("/account/v1/auth").Subrouter()
 	s.Use(JwtVerify)
-	s.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
+	
+	s.Methods("GET").Path("/account/v1/user/{id}").Handler(httptransport.NewServer(
 		endpoints.GetUser,
 		decodeEmailReq,
 		encodeResponse,

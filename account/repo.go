@@ -10,6 +10,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"gokit-example/account/helpers"
 	"time"
+	// "go.mongodb.org/mongo-driver/mongo"
 )
 
 var RepoErr = errors.New("Unable to handle Repo Request")
@@ -30,9 +31,9 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 }
 
 
-func (repo *repo) CreateUser(ctx context.Context, user User) error {
+func (repo *repo) CreateUser(ctx context.Context, user User) (string, error) {
 	if user.Email == "" || user.Password == "" {
-		return RepoErr
+		return "Some data is missing", RepoErr
 	}
 	collection := repo.db.Database(database).Collection(collection)
 	pwd := helpers.HashAndSalt([]byte(user.Password))
@@ -40,16 +41,18 @@ func (repo *repo) CreateUser(ctx context.Context, user User) error {
 	fmt.Println("user", user)
 	insertResult, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
-        return err
+		fmt.Printf("error type: %T", err)
+		// most likely an email is already registered
+		// return err
+		return "email is already in use", nil
     }
     fmt.Println("Inserted a Single Document: ", insertResult.InsertedID)
-	return nil
+	return "User Created", nil
 }
 func (repo *repo) UpdateUser(ctx context.Context, id string, user User) (string, error) {
 	if user.Email == "" || user.Password == "" {
 		return "Some info is missing", nil
 	}
-	fmt.Println(id, user.Email, "im hereeeeeeeeeeeee")
 	filter := bson.M{
 		"id": id,
 	}
@@ -60,14 +63,17 @@ func (repo *repo) UpdateUser(ctx context.Context, id string, user User) (string,
         filter,
         update,
 	)
-	fmt.Println(result, "im hereeeeeeeeeeeee")
 	if err != nil {
 		// Email not found
 		// RepoErr difficult to handle
-		// return "", "User not found", err 
-		return "User not found", nil
+		return "Error", nil
+	} 
+	if result.MatchedCount == 1 {
+		return "User Updated", nil
+	} else {
+		return "User Not Found", nil
 	}
-	return "", nil
+	// return "", nil
 }
 
 func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error) {

@@ -30,15 +30,15 @@ func (s service) CreateUser(ctx context.Context, email string, password string) 
 		Email:    email,
 		Password: password,
 	}
-
-	if err := s.repostory.CreateUser(ctx, user); err != nil {
+	message, err := s.repostory.CreateUser(ctx, user);
+	if err != nil {
 		level.Error(logger).Log("err", err)
 		return "", err
 	}
 
 	logger.Log("create user", id)
 
-	return "Success", nil
+	return message, nil
 }
 
 func (s service) UpdateUser(ctx context.Context, id string, email string, password string) (string, error) {
@@ -51,7 +51,6 @@ func (s service) UpdateUser(ctx context.Context, id string, email string, passwo
 	}
 	message, err := s.repostory.UpdateUser(ctx, id, user)
 	if err != nil {
-		// fmt.Println(email, message, err, "message")
 		level.Error(logger).Log("err", err)
 		return "", err
 	}

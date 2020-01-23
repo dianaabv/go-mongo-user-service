@@ -17,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
     // "go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // TODO os.Getenv
@@ -59,8 +60,18 @@ func main() {
 	if err != nil {
 		level.Error(logger).Log("exit", err)
 	}
+
 	flag.Parse()
 	ctx := context.Background()
+	// add email index to user on start of application
+	opt := options.Index()
+	opt.SetUnique(true)
+	index := mongo.IndexModel{Keys: bson.M{"email": 1}, Options: opt}
+	coll := db.Database(database).Collection(collection)
+	if _, err := coll.Indexes().CreateOne(ctx, index); err != nil {
+	  fmt.Println("Could not create index:", err)
+	}
+	// end  of it 
 	var srv account.Service
 	{	
 		repository := account.NewRepo(db, logger)

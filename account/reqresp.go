@@ -62,7 +62,6 @@ func decodeUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println(req, "req1111111111111")
 	return req, nil
 }
 func decodeUpdateUserReq(ctx context.Context, r *http.Request) (interface{}, error) {

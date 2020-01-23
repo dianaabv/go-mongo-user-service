@@ -23,30 +23,27 @@ func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 
 	s.Methods("POST").Path("/createactivity").Handler(httptransport.NewServer(
 		endpoints.CreateActivity,
-		decodeUserReq,
+		decodeActivityReq,
 		encodeResponse,
 	))
 
-	// r.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
-	// 	endpoints.GetUser,
-	// 	decodeEmailReq,
-	// 	encodeResponse,
-	// ))
+	s.Methods("GET").Path("/activity/{id}").Handler(httptransport.NewServer(
+		endpoints.GetActivity,
+		decodeDelGetActivityReq,
+		encodeResponse,
+	))
 
-	// r.Methods("POST").Path("/login").Handler(httptransport.NewServer(
-	// 	endpoints.UserLogin,
-	// 	decodeUserLoginReq,
-	// 	encodeResponse,
-	// ))
-	
-	// // Auth route
-	// s := r.PathPrefix("/auth").Subrouter()
-	// s.Use(JwtVerify)
-	// s.Methods("GET").Path("/user/{id}").Handler(httptransport.NewServer(
-	// 	endpoints.GetUser,
-	// 	decodeEmailReq,
-	// 	encodeResponse,
-	// ))
+	s.Methods("DELETE").Path("/delete/{id}").Handler(httptransport.NewServer(
+		endpoints.DeleteActivity,
+		decodeDelGetActivityReq,
+		encodeResponse,
+	))
+
+	s.Methods("PATCH").Path("/update/{id}").Handler(httptransport.NewServer(
+		endpoints.UpdateActivity,
+		decodeDelGetActivityReq,
+		encodeResponse,
+	))
 
 	return r
 

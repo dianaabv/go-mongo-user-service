@@ -3,7 +3,7 @@ package activity
 import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
-	// "go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson"
 	"errors"
 	"fmt"
 	"github.com/go-kit/kit/log"
@@ -44,4 +44,62 @@ func (repo *repo) CreateActivity(ctx context.Context, activity Activity) (string
     }
     fmt.Println("Inserted a Single Document: ", insertResult.InsertedID)
 	return "Activity created", true, nil
+}
+
+func (repo *repo) UpdateActivity(ctx context.Context, id string, activity Activity) (string, error) {
+	if activity.Name == "" || activity.Location == "" {
+		return "Some info is missing", nil
+	}
+	filter := bson.M{
+		"id": id,
+	}
+	update := bson.M{"$set": bson.M{"name": activity.Name}}
+	collection := repo.db.Database(database).Collection(collection)
+	result, err := collection.UpdateOne(
+        ctx,
+        filter,
+        update,
+	)
+	if err != nil {
+		// Email not found
+		// RepoErr difficult to handle
+		return "Error", nil
+	} 
+	if result.MatchedCount == 1 {
+		return "User Updated", nil
+	} else {
+		return "User Not Found", nil
+	}
+	// return "", nil
+}
+
+func (repo *repo) GetActivity(ctx context.Context, id string) (string, string, error) {
+	var activity Activity
+	fmt.Println("id", id)
+	filter := bson.M{
+		"id": id,
+	}
+	collection := repo.db.Database(database).Collection(collection)
+	err := collection.FindOne(ctx, filter).Decode(&activity)
+	if err != nil {
+		// Email not found
+		// RepoErr difficult to handle
+		// return "", "User not found", err 
+		return "", "Activity not found", nil
+	}
+	return activity.Name, "Activity found", nil
+}
+
+func (repo *repo) DeleteActivity(ctx context.Context, id string) (string, error) {
+	filter := bson.M{
+		"id": id,
+	}
+	collection := repo.db.Database(database).Collection(collection)
+	res, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		// Email not found
+		return "", RepoErr
+	}
+	fmt.Println("res", res)
+	return "Success", nil
 }

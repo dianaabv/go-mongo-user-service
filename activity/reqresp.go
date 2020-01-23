@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	// "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 	"fmt"
 )
 
@@ -16,10 +16,32 @@ type (
 		Location string `json:"location"`
 	}
 	CreateActivityResponse struct {
-		// Email string `json:"email"`
-		// Token string `json:"token"`
 		Ok bool `json:"ok"`
 		Message string `json: "message"` 
+	}
+	GetActivityRequest struct {
+		Id string `json:"id"`
+	}
+	GetActivityResponse struct {
+		Name     string `json:"name"`
+		Message  string `json:"message"`
+		Ok 		 bool `json:"ok"`
+
+	}
+	DeleteActivityRequest struct {
+		Id string `json:"id"`
+	}
+	DeleteActivityResponse struct {
+		Ok 		 bool `json:"ok"`
+	}
+	UpdateActivityRequest struct {
+		Id string `json:"id"`
+		Name    string `json:"name"`
+		Location string `json:"location"`
+
+	}
+	UpdateActivityResponse struct {
+		Ok 		 bool `json:"ok"`
 	}
 )
 
@@ -28,7 +50,7 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 	return json.NewEncoder(w).Encode(response)
 }
 
-func decodeUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
+func decodeActivityReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req CreateActivityRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -38,23 +60,26 @@ func decodeUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
-// func decodeEmailReq(ctx context.Context, r *http.Request) (interface{}, error) {
-// 	var req GetUserRequest
-// 	vars := mux.Vars(r)
+func decodeUpdateActivityReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req UpdateActivityRequest
+	vars := mux.Vars(r)
 
-// 	req = GetUserRequest{
-// 		Id: vars["id"],
-// 	}
-// 	return req, nil
-// }
+	req = UpdateActivityRequest{
+		Id: vars["id"],
+	}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
 
-// func decodeUserLoginReq(ctx context.Context, r *http.Request) (interface{}, error) {
-// 	var req CreateUserLoginRequest
-// 	// var res CreateUserLoginResponse
-// 	// super important line
-// 	err := json.NewDecoder(r.Body).Decode(&req)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return req, nil
-// }
+func decodeDelGetActivityReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req GetActivityRequest
+	vars := mux.Vars(r)
+
+	req = GetActivityRequest{
+		Id: vars["id"],
+	}
+	return req, nil
+}

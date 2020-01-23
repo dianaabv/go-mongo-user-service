@@ -15,6 +15,7 @@ type Activity struct {
 
 type Repository interface {
 	CreateActivity(ctx context.Context, activity Activity)  (string, bool, error)
-	// GetUser(ctx context.Context, id string) (string, error)
-	// GetUserLogin(ctx context.Context, email string, password string) (string, string, error)
+	GetActivity(ctx context.Context, id string) (string, string, error)
+	DeleteActivity(cts context.Context, id string) (string, error) 
+	UpdateActivity(ctx context.Context, id string, activity Activity) (string, error)
 }

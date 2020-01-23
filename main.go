@@ -88,7 +88,7 @@ func main() {
 
 
 	mux := http.NewServeMux()
-	// // activity.NewHTTPServer(ctx, activityEndpoints)
+	// activity.NewHTTPServer(ctx, activityEndpoints)
 	accountEndpoints := account.MakeEndpoints(srv)
 	activityEndpoints := activity.MakeEndpoints(actv)
 	mux.Handle("/account/v1/", account.NewHTTPServer(ctx, accountEndpoints))

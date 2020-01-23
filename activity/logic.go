@@ -5,6 +5,7 @@ import (
 	"context"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
+	"github.com/gofrs/uuid"
 )
 
 type service struct {
@@ -18,23 +19,26 @@ func NewService(rep Repository, logger log.Logger) Service {
 		logger:    logger,
 	}
 }
-func (s service) CreateActivity(ctx context.Context, id string) (string, error) {
+func (s service) CreateActivity(ctx context.Context, name string, location string) (string, bool, error) {
 	logger := log.With(s.logger, "method", "CreateActivity")
+	uuid, _ := uuid.NewV4()
+	id := uuid.String()
 	var activity Activity
 	// level.Error(logger).Log("err", err)
-	// activity = Activity{
-	// 	ID:       "id",
-	// 	Name:     "name",
-	// 	Location: "location",
-	// }
-	if err := s.repostory.CreateActivity(ctx, activity); err != nil {
+	activity = Activity{
+		ID:       id,
+		Name:     name,
+		Location: location,
+	}
+	message, ok, err := s.repostory.CreateActivity(ctx, activity);
+	if  err != nil {
 		level.Error(logger).Log("err", err)
-		return "", err
+		return "", false, nil
 	}
 
-	logger.Log("create activity",  "asds")
+	logger.Log("create activity",  "done")
 
-	return "Success", nil
+	return message, ok, nil
 	// return "", nil
 
 }

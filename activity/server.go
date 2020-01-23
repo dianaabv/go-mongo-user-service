@@ -9,14 +9,19 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	// "encoding/json"
 	// "gokit-example/account/models"
+	"gokit-example/account/helpers"
 )
 
 
 func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 	r := mux.NewRouter()
 	r.Use(commonMiddleware)
+	// Auth route
+	s := r.PathPrefix("/activity/v1/auth").Subrouter()
+	s.Use(helpers.JwtVerify)
+		
 
-	r.Methods("POST").Path("/activity/v1/createactivity").Handler(httptransport.NewServer(
+	s.Methods("POST").Path("/createactivity").Handler(httptransport.NewServer(
 		endpoints.CreateActivity,
 		decodeUserReq,
 		encodeResponse,

@@ -22,8 +22,8 @@ func makeCreateActivityEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateActivityRequest)
 		fmt.Println(req)
-		ok, err := s.CreateActivity(ctx, "zsd")
+		message, ok, err := s.CreateActivity(ctx, req.Name, req.Location)
 		fmt.Println(req, ok)
-		return CreateActivityResponse{Ok: true}, err
+		return CreateActivityResponse{Message: message, Ok: ok}, err
 	}
 }

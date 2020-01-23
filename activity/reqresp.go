@@ -19,6 +19,7 @@ type (
 		// Email string `json:"email"`
 		// Token string `json:"token"`
 		Ok bool `json:"ok"`
+		Message string `json: "message"` 
 	}
 )
 

@@ -14,7 +14,7 @@ type Activity struct {
 }
 
 type Repository interface {
-	CreateActivity(ctx context.Context, activity Activity) error
+	CreateActivity(ctx context.Context, activity Activity)  (string, bool, error)
 	// GetUser(ctx context.Context, id string) (string, error)
 	// GetUserLogin(ctx context.Context, email string, password string) (string, string, error)
 }

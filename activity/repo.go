@@ -30,18 +30,18 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 }
 
 
-func (repo *repo) CreateActivity(ctx context.Context, activity Activity) error {
-	// if user.Email == "" || user.Password == "" {
-	// 	return RepoErr
-	// }
+func (repo *repo) CreateActivity(ctx context.Context, activity Activity) (string, bool, error) {
+	if activity.Name == "" || activity.Location == "" {
+		return "Some data is missing", false, RepoErr
+	}
 	collection := repo.db.Database(database).Collection(collection)
 	// pwd := helpers.HashAndSalt([]byte(user.Password))
 	// user.Password = pwd
 	fmt.Println("activity", activity)
 	insertResult, err := collection.InsertOne(context.TODO(), activity)
 	if err != nil {
-        return err
+        return "Something went wrong", false, err
     }
     fmt.Println("Inserted a Single Document: ", insertResult.InsertedID)
-	return nil
+	return "Activity created", true, nil
 }

@@ -10,6 +10,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"gokit-example/account/helpers"
 	"time"
+	"go.mongodb.org/mongo-driver/bson/primitive" // for BSON ObjectID
+
 	// "go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -32,9 +34,19 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 
 
 func (repo *repo) CreateUser(ctx context.Context, user User) (string, error) {
-	if user.Email == "" || user.Password == "" {
-		return "Some data is missing", RepoErr
-	}
+	// if user.Email == "" || user.Password == ""  {
+	// 	return "Some data is missing", RepoErr
+	// }
+	// check := helpers.CheckValues(user)
+	// if !check {
+	// 	return "Some data is missing", RepoErr
+	// }
+
+	// fmt.Println(user.Email, user.Password,user.Name, user.Lastname,user.Phone,user.Dob,user.Country,user.Bio)
+	// if user.Email == "" || user.Password == "" || user.Name == "" || user.Lastname == "" || user.Phone == "" || user.Dob == ""  || user.Country == ""  || user.Bio == "" {
+	// 	fmt.Println("im here")
+	// 	return "Some data is missing", RepoErr
+	// }
 	collection := repo.db.Database(database).Collection(collection)
 	pwd := helpers.HashAndSalt([]byte(user.Password))
 	user.Password = pwd
@@ -79,8 +91,12 @@ func (repo *repo) UpdateUser(ctx context.Context, id string, user User) (string,
 func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error) {
 	var user User
 	fmt.Println("id", id)
+	docID, _err := primitive.ObjectIDFromHex(id)
+	if _err != nil {
+		return "", "Wrong User id", nil
+	}
 	filter := bson.M{
-		"id": id,
+		"_id": docID,
 	}
 	collection := repo.db.Database(database).Collection(collection)
 	err := collection.FindOne(ctx, filter).Decode(&user)
@@ -94,8 +110,12 @@ func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error
 }
 
 func (repo *repo) DeleteUser(ctx context.Context, id string) (string, error) {
+	docID, _err := primitive.ObjectIDFromHex(id)
+	if _err != nil {
+		return "Wrong User id", nil
+	}
 	filter := bson.M{
-		"id": id,
+		"_id": docID,
 	}
 	collection := repo.db.Database(database).Collection(collection)
 	res, err := collection.DeleteOne(ctx, filter)
@@ -130,7 +150,7 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
 
 	tk := &User{
-		ID: user.ID,
+		// ID: user.ID,
 		Email:  user.Email,
 		StandardClaims: &jwt.StandardClaims{
 			ExpiresAt: expiresAt,

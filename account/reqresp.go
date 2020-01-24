@@ -13,6 +13,14 @@ type (
 	CreateUserRequest struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+		Name 	 string `json:"name"`
+		Lastname string `json:"lastname"`
+		Phone 	 string `json:"phone"`
+		Dob 	 string `json:"dob"`
+		Country  string `json:"country"`
+		Bio 	 string `json:"bio"`
+		// Photo 	  string `json:"photo"`
+		Activated bool   `json:"activated"`
 	}
 	CreateUserResponse struct {
 		Ok string `json:"ok"`

@@ -11,13 +11,20 @@ import (
 
 type (
 	CreateActivityRequest struct {
-		ID       string `json:"id,omitempty"`
-		Name     string `json:"name"`
-		Location string `json:"location"`
+		// ID       string `json:"id,omitempty"`
+		Name        string `json:"name"`
+		Category    string `json:"category"`
+		Location    string `json:"location"`
+		Date 	    string `json:"date"`
+		Maxpeople   int    `json:"maxpeople"`
+		// Photo 	string `json:"photo"`
+		Description string `json:"description"`
+		Owner       string `json:"owner"`
+		Placesleft  int    `json:"placesleft"`
 	}
 	CreateActivityResponse struct {
 		Ok bool `json:"ok"`
-		Message string `json: "message"` 
+		Message  string `json:"message"`
 	}
 	GetActivityRequest struct {
 		Id string `json:"id"`
@@ -38,10 +45,10 @@ type (
 		Id string `json:"id"`
 		Name    string `json:"name"`
 		Location string `json:"location"`
-
 	}
 	UpdateActivityResponse struct {
 		Ok 		 bool `json:"ok"`
+		Message  string `json:"message"`
 	}
 )
 

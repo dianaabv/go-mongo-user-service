@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/gofrs/uuid"
+	// "github.com/gofrs/uuid"
 	"fmt"
 )
 
@@ -20,32 +20,32 @@ func NewService(rep Repository, logger log.Logger) Service {
 	}
 }
 
-func (s service) CreateUser(ctx context.Context, email string, password string) (string, error) {
+// func (s service) CreateUser(ctx context.Context, email string, password string, name string, lastname string, phone string, dob string, country string, bio string, activated bool) (string, error) {
+func (s service) CreateUser(ctx context.Context, user User) (string, error) {
 	logger := log.With(s.logger, "method", "CreateUser")
-	
-	uuid, _ := uuid.NewV4()
-	id := uuid.String()
-	user := User{
-		ID:       id,
-		Email:    email,
-		Password: password,
-	}
+	// uuid, _ := uuid.NewV4()
+	// id := uuid.String()
+	// user := User{
+	// 	ID:       id,
+	// 	Email:    email,
+	// 	Password: password,
+	// }
 	message, err := s.repostory.CreateUser(ctx, user);
 	if err != nil {
 		level.Error(logger).Log("err", err)
 		return "", err
 	}
 
-	logger.Log("create user", id)
+	// logger.Log("create user", id)
 
 	return message, nil
 }
-
+// TODO
 func (s service) UpdateUser(ctx context.Context, id string, email string, password string) (string, error) {
 	logger := log.With(s.logger, "method", "UpdateUser")
 	fmt.Println(id, "im hereeeeeeeeeeeee")
 	user := User{
-		ID:       id,
+		// ID:       id,
 		Email:    email,
 		Password: password,
 	}

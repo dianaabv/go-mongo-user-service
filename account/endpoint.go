@@ -27,7 +27,22 @@ func MakeEndpoints(s Service) Endpoints {
 func makeCreateUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateUserRequest)
-		ok, err := s.CreateUser(ctx, req.Email, req.Password)
+		fmt.Println(req)
+		user := User{
+			// ID:       id,
+			Email:    req.Email,
+			Password: req.Password,
+			Name: req.Name,
+			Lastname: req.Lastname,
+			Phone: req.Phone,
+			Dob: req.Dob,
+			Country: req.Country,
+			Bio: req.Bio,
+			Activated: req.Activated,
+			
+		}
+		// ok, err := s.CreateUser(ctx, req.Email, req.Password, req.Name, req.Lastname, req.Phone, req.Dob, req.Country, req.Bio, req.Activated)
+		ok, err := s.CreateUser(ctx, user)
 		return CreateUserResponse{Ok: ok}, err
 	}
 }

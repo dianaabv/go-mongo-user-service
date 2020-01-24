@@ -2,9 +2,11 @@ package activity
 
 import (
 	"context"
-
+	// "encoding/hex" // hexadecimal encoding of BSON obj
 	"github.com/go-kit/kit/endpoint"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson/primitive" // for BSON ObjectID
+
 )
 
 
@@ -28,9 +30,24 @@ func makeCreateActivityEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateActivityRequest)
 		fmt.Println(req)
-		message, ok, err := s.CreateActivity(ctx, req.Name, req.Location)
+		docID, err := primitive.ObjectIDFromHex(req.Owner)
+		activity := Activity{
+			Name        :    req.Name,
+			Category    :    req.Category,
+			Location    :    req.Location,
+			Date        :    req.Date,
+			Maxpeople   :    req.Maxpeople,
+			// Photo 	  string `json:"photo"`
+			Description :    req.Description,
+			Owner       :    docID,
+			Placesleft  :    req.Placesleft,
+		}
+		message, ok, err := s.CreateActivity(ctx, activity)
 		fmt.Println(req, ok)
-		return CreateActivityResponse{Message: message, Ok: ok}, err
+		return CreateActivityResponse{
+			Ok: ok,
+			Message: message,
+		}, err
 	}
 }
 
@@ -48,7 +65,7 @@ func makeGetActivityEndpoint(s Service) endpoint.Endpoint {
 
 func makeDeleteActivityEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(DeleteActivityRequest)
+		req := request.(GetActivityRequest)
 		Message, Ok, err := s.DeleteActivity(ctx, req.Id)
 		fmt.Println(Ok, Message, "ok")
 		return DeleteActivityResponse{
@@ -63,7 +80,10 @@ func makeUpdateActivityEndpoint(s Service) endpoint.Endpoint {
 		req := request.(UpdateActivityRequest)
 		message, ok, err := s.UpdateActivity(ctx, req.Id, req.Name,req.Location)
 		fmt.Println(message, "message")
-		return UpdateActivityResponse{Ok: ok}, err
+		return UpdateActivityResponse{
+			Ok: ok,
+			Message: message,
+		}, err
 	}
 }
 

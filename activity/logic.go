@@ -1,11 +1,11 @@
 package activity
 
 import (
-	"fmt"
+	// "fmt"
 	"context"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/gofrs/uuid"
+	// "github.com/gofrs/uuid"
 )
 
 type service struct {
@@ -19,17 +19,17 @@ func NewService(rep Repository, logger log.Logger) Service {
 		logger:    logger,
 	}
 }
-func (s service) CreateActivity(ctx context.Context, name string, location string) (string, bool, error) {
+func (s service) CreateActivity(ctx context.Context, activity Activity) (string, bool, error) {
 	logger := log.With(s.logger, "method", "CreateActivity")
-	uuid, _ := uuid.NewV4()
-	id := uuid.String()
-	var activity Activity
-	// level.Error(logger).Log("err", err)
-	activity = Activity{
-		ID:       id,
-		Name:     name,
-		Location: location,
-	}
+	// uuid, _ := uuid.NewV4()
+	// id := uuid.String()
+	// var activity Activity
+	// // level.Error(logger).Log("err", err)
+	// activity = Activity{
+	// 	// ID:       id,
+	// 	Name:     name,
+	// 	Location: location,
+	// }
 	message, ok, err := s.repostory.CreateActivity(ctx, activity);
 	if  err != nil {
 		level.Error(logger).Log("err", err)
@@ -44,9 +44,9 @@ func (s service) CreateActivity(ctx context.Context, name string, location strin
 }
 func (s service) UpdateActivity(ctx context.Context, id string, name string, location string) (string, bool, error) {
 	logger := log.With(s.logger, "method", "UpdateActivity")
-	fmt.Println(id, "im hereeeeeeeeeeeee")
+	// fmt.Println(id, "im hereeeeeeeeeeeee")
 	activity := Activity{
-		ID:       id,
+		// ID:       id,
 		Name:    name,
 		Location: location,
 	}

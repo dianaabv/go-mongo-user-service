@@ -41,7 +41,7 @@ func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 
 	s.Methods("PATCH").Path("/update/{id}").Handler(httptransport.NewServer(
 		endpoints.UpdateActivity,
-		decodeDelGetActivityReq,
+		decodeUpdateActivityReq,
 		encodeResponse,
 	))
 

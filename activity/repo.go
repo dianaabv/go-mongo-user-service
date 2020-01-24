@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-kit/kit/log"
+
 	// "github.com/dgrijalva/jwt-go"
 	// "gokit-example/account/helpers"
 	// "time"
@@ -31,9 +32,14 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 
 
 func (repo *repo) CreateActivity(ctx context.Context, activity Activity) (string, bool, error) {
-	if activity.Name == "" || activity.Location == "" {
-		return "Some data is missing", false, RepoErr
-	}
+	// if activity.Name == "" || activity.Location == "" {
+	// 	return "Some data is missing", false, RepoErr
+	// }
+	
+	// fmt.Println(hexByte, "hexByte")
+	// blah := string(hexByte)
+
+	// activity.Owner = hexByte
 	collection := repo.db.Database(database).Collection(collection)
 	// pwd := helpers.HashAndSalt([]byte(user.Password))
 	// user.Password = pwd
@@ -51,7 +57,7 @@ func (repo *repo) UpdateActivity(ctx context.Context, id string, activity Activi
 		return "Some info is missing", nil
 	}
 	filter := bson.M{
-		"id": id,
+		"_id": id,
 	}
 	update := bson.M{"$set": bson.M{"name": activity.Name}}
 	collection := repo.db.Database(database).Collection(collection)
@@ -66,9 +72,9 @@ func (repo *repo) UpdateActivity(ctx context.Context, id string, activity Activi
 		return "Error", nil
 	} 
 	if result.MatchedCount == 1 {
-		return "User Updated", nil
+		return "Activity Updated", nil
 	} else {
-		return "User Not Found", nil
+		return "Activity Not Found", nil
 	}
 	// return "", nil
 }

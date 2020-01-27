@@ -19,6 +19,7 @@ var RepoErr = errors.New("Unable to handle Repo Request")
 const (
 	database   = "buddyApp"
 	collection = "goUsers"
+	collectionToken = "goTokens"
 )
 type repo struct {
 	db     *mongo.Client
@@ -33,22 +34,43 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 }
 
 
-func (repo *repo) CreateUser(ctx context.Context, user User) (string, error) {
+func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User, error) {
 	collection := repo.db.Database(database).Collection(collection)
 	pwd := helpers.HashAndSalt([]byte(user.Password))
 	user.Password = pwd
-	// fmt.Println("user", user.Photo)
-	
 	insertResult, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		fmt.Printf("error type: %T", err)
 		// most likely an email is already registered
 		// return err
-		return "email is already in use", nil
-    }
-    fmt.Println("Inserted a Single Document: ", insertResult.InsertedID)
-	return "User Created", nil
+		return false, "E-mail is already in use", user, nil
+	}
+	tk := &Token{}
+	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, error := token.SignedString([]byte("secret"))
+	if error != nil {
+		return false, "Could not create a token", user, nil
+	}
+	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
+	tk = &Token{
+		// ID: user.ID,
+		Email:  user.Email,
+		Token: tokenString,
+		StandardClaims: &jwt.StandardClaims{
+			ExpiresAt: expiresAt,
+		},
+	}	
+	// expiresAt := time.Now().Add(time.Minute * 100000).Unix()
+	// TODO env variable
+	collectionToken := repo.db.Database(database).Collection(collectionToken)
+	insertTokenResult, err := collectionToken.InsertOne(context.TODO(), tk)
+	if err != nil {
+		return false, "Could not save a token", user, nil
+	}
+    fmt.Println("Inserted a Single Document: ", insertResult.InsertedID, insertTokenResult.InsertedID)
+	return true, "User Created", user, nil
 }
+
 func (repo *repo) UpdateUser(ctx context.Context, id string, user User) (string, error) {
 	if user.Email == "" || user.Password == "" {
 		return "Some info is missing", nil

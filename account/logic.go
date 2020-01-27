@@ -21,7 +21,7 @@ func NewService(rep Repository, logger log.Logger) Service {
 }
 
 // func (s service) CreateUser(ctx context.Context, email string, password string, name string, lastname string, phone string, dob string, country string, bio string, activated bool) (string, error) {
-func (s service) CreateUser(ctx context.Context, user User) (string, error) {
+func (s service) CreateUser(ctx context.Context, user User) (bool, string, User, error) {
 	logger := log.With(s.logger, "method", "CreateUser")
 	// uuid, _ := uuid.NewV4()
 	// id := uuid.String()
@@ -30,15 +30,15 @@ func (s service) CreateUser(ctx context.Context, user User) (string, error) {
 	// 	Email:    email,
 	// 	Password: password,
 	// }
-	message, err := s.repostory.CreateUser(ctx, user);
+	ok, message, user, err := s.repostory.CreateUser(ctx, user);
 	if err != nil {
 		level.Error(logger).Log("err", err)
-		return "", err
+		return ok, message, user, err
 	}
 
 	// logger.Log("create user", id)
 
-	return message, nil
+	return ok, message, user, nil
 }
 // TODO
 func (s service) UpdateUser(ctx context.Context, id string, email string, password string) (string, error) {

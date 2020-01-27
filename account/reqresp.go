@@ -6,11 +6,15 @@ import (
 	"net/http"
 	"gokit-example/account/models"
 	"github.com/gorilla/mux"
+	// "reflect"
 	// "fmt"
 	// "io/ioutil"
 )
 type User models.User
-
+type Token models.Token
+// func (user User) IsStructureEmpty() bool {
+// 	return reflect.DeepEqual(user, User{})
+// }
 type (
 	CreateUserRequest struct {
 		Email    string `json:"email"`
@@ -26,7 +30,9 @@ type (
 		Activated bool   `json:"activated"`
 	}
 	CreateUserResponse struct {
-		Ok string `json:"ok"`
+		Ok bool `json:"ok"`
+		Message string `json:"message"`
+		Respuser User `json:"user"`
 	}
 
 	GetUserRequest struct {

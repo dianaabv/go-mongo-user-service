@@ -23,11 +23,16 @@ func MakeEndpoints(s Service) Endpoints {
 		UpdateUser : makeUpdateUserEndpoint(s),
 	}
 }
+// func (user User) IsStructureEmpty() bool {
+// 	return reflect.DeepEqual(user, User{})
+// }
 
 func makeCreateUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateUserRequest)
-		fmt.Println(req)
+		if (req.Email == "" || req.Password == "") {
+			return CreateUserResponse{Ok: false, Message: "Some data is missing"}, nil
+		}
 		// TODO 
 		user := User{
 			// ID:       id,
@@ -42,9 +47,8 @@ func makeCreateUserEndpoint(s Service) endpoint.Endpoint {
 			Activated: req.Activated,
 			Photo: req.Photo,
 		}
-		// ok, err := s.CreateUser(ctx, req.Email, req.Password, req.Name, req.Lastname, req.Phone, req.Dob, req.Country, req.Bio, req.Activated)
-		ok, err := s.CreateUser(ctx, user)
-		return CreateUserResponse{Ok: ok}, err
+		ok, message, user, err := s.CreateUser(ctx, user)
+		return CreateUserResponse{Ok: ok, Message: message, Respuser: user,}, err
 	}
 }
 

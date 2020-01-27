@@ -13,7 +13,8 @@ type User struct {
 	Dob 	  string `json:"dob"`
 	Country   string `json:"country"`
 	Bio 	  string `json:"bio"`
-	// Photo 	  string `json:"photo"`
+	Photo 	  string `json:"photo"`
+	// Photo 	  []byte `json:"photo"`
 	Activated bool   `json:"activated"`
 	*jwt.StandardClaims
 }

@@ -28,6 +28,7 @@ func makeCreateUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateUserRequest)
 		fmt.Println(req)
+		// TODO 
 		user := User{
 			// ID:       id,
 			Email:    req.Email,
@@ -39,7 +40,7 @@ func makeCreateUserEndpoint(s Service) endpoint.Endpoint {
 			Country: req.Country,
 			Bio: req.Bio,
 			Activated: req.Activated,
-			
+			Photo: req.Photo,
 		}
 		// ok, err := s.CreateUser(ctx, req.Email, req.Password, req.Name, req.Lastname, req.Phone, req.Dob, req.Country, req.Bio, req.Activated)
 		ok, err := s.CreateUser(ctx, user)
@@ -58,10 +59,12 @@ func makeUpdateUserEndpoint(s Service) endpoint.Endpoint {
 func makeGetUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(GetUserRequest)
-		email, message, err := s.GetUser(ctx, req.Id)
+		ok, message, user, err := s.GetUser(ctx, req.Id)
+		fmt.Println(user, message)
 		return GetUserResponse{
-			Email: email,
+			Ok: ok,
 			Message: message,
+			Respuser: user,
 		}, err
 	}
 }
@@ -81,11 +84,13 @@ func makeGetUserLoginEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(CreateUserLoginRequest)
 		// fmt.Println(req)
-		email, token, err := s.GetUserLogin(ctx, req.Email, req.Password)
+		email, token, user, ok, err := s.GetUserLogin(ctx, req.Email, req.Password)
 
 		return CreateUserLoginResponse{
 			Email   : email,
 			Token   : token,
+			Respuser: user,
+			Ok		: ok,
 		}, err
 	}
 }

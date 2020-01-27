@@ -28,3 +28,6 @@ type Repository interface {
 	DeleteActivity(cts context.Context, id string) (string, error) 
 	UpdateActivity(ctx context.Context, id string, activity Activity) (string, error)
 }
+
+
+// curl -i -F "email=email@address.com" -F "password=password" -F "name=mark10" -F "lastname=MarkTen" -F "phone=12323" -F "country=M" -F "bio=dad" -F  "dob=1955.01.01" -F  "activated=true" -F  "photo=@/home/diana/Pictures/photo.png" localhost:8080/account/v1/user

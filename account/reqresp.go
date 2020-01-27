@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-
+	"gokit-example/account/models"
 	"github.com/gorilla/mux"
 	// "fmt"
+	// "io/ioutil"
 )
+type User models.User
 
 type (
 	CreateUserRequest struct {
@@ -19,7 +21,8 @@ type (
 		Dob 	 string `json:"dob"`
 		Country  string `json:"country"`
 		Bio 	 string `json:"bio"`
-		// Photo 	  string `json:"photo"`
+		// Photo 	 []byte `json:"photo"`
+		Photo 	 string `json:"photo"`
 		Activated bool   `json:"activated"`
 	}
 	CreateUserResponse struct {
@@ -30,8 +33,9 @@ type (
 		Id string `json:"id"`
 	}
 	GetUserResponse struct {
+		Ok bool `json:"ok"`
 		Message string `json:"message"`
-		Email string `json:"email"`
+		Respuser User `json:"user"`
 	}
 	DeleteUserRequest struct {
 		Id string `json:"id"`
@@ -55,7 +59,8 @@ type (
 	CreateUserLoginResponse struct {
 		Email string `json:"email"`
 		Token string `json:"token"`
-		Ok bool `json:"ok"`
+		Respuser User `json:"user"`
+		Ok 	  bool `json:"ok"`
 	}
 )
 
@@ -65,12 +70,35 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 }
 
 func decodeUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	// TODO  refine it
 	var req CreateUserRequest
+
 	err := json.NewDecoder(r.Body).Decode(&req)
+
+	//photo file logic
+	// file, handler, err := r.FormFile("photo")
+    // if err != nil {
+    //     fmt.Println("Error Retrieving the File")
+    //     fmt.Println(err)
+    //     //return
+	// }
+	// defer file.Close()
+    // fmt.Printf("Uploaded File: %+v\n", handler.Filename)
+	// fmt.Printf("File Size: %+v\n", handler.Size)
+	//  // byte array
+	// fileBytes, err := ioutil.ReadAll(file)
+	// if err != nil {
+	//     fmt.Println(err)
+	// }
+	// req.Photo = fileBytes
 	if err != nil {
 		return nil, err
 	}
 	return req, nil
+
+	// fmt.Printf(r.FormValue("bio"))
+	// var req = r.ParseForm()
+	// return req, nil
 }
 func decodeUpdateUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req UpdateUserRequest

@@ -60,19 +60,20 @@ func (s service) UpdateUser(ctx context.Context, id string, email string, passwo
 	return message, nil
 }
 
-func (s service) GetUser(ctx context.Context, id string) (string, string, error) {
+func (s service) GetUser(ctx context.Context, id string) (bool, string, User, error) {
 	logger := log.With(s.logger, "method", "GetUser")
 
-	email, message, err := s.repostory.GetUser(ctx, id)
+	ok, message, user, err := s.repostory.GetUser(ctx, id)
 	if err != nil {
 		// fmt.Println(email, message, err, "message")
 		level.Error(logger).Log("err", err)
-		return "", message, err
+		return ok, message, user, err
+		// return "", message, err
 	}
 
 	logger.Log("Get user", id)
 
-	return email, message, nil
+	return ok, message, user, nil
 }
 
 func (s service) DeleteUser(ctx context.Context, id string) (string, error) {
@@ -88,15 +89,15 @@ func (s service) DeleteUser(ctx context.Context, id string) (string, error) {
 	return res, nil
 }
 
-func (s service) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {
+func (s service) GetUserLogin(ctx context.Context, email string, password string) (string, string, User, bool, error) {
 	logger := log.With(s.logger, "method", "GetUserLogin")
 
-	email, token, err := s.repostory.GetUserLogin(ctx, email, password)
+	email, token, user, ok, err := s.repostory.GetUserLogin(ctx, email, password)
 
 	if err != nil {
 		level.Error(logger).Log("err", err)
-		return "", "", err
+		return "", "", user, ok, err
 	}
 
-	return email, token, nil
+	return email, token, user, ok, nil
 }

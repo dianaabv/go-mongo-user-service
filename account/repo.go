@@ -34,23 +34,11 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 
 
 func (repo *repo) CreateUser(ctx context.Context, user User) (string, error) {
-	// if user.Email == "" || user.Password == ""  {
-	// 	return "Some data is missing", RepoErr
-	// }
-	// check := helpers.CheckValues(user)
-	// if !check {
-	// 	return "Some data is missing", RepoErr
-	// }
-
-	// fmt.Println(user.Email, user.Password,user.Name, user.Lastname,user.Phone,user.Dob,user.Country,user.Bio)
-	// if user.Email == "" || user.Password == "" || user.Name == "" || user.Lastname == "" || user.Phone == "" || user.Dob == ""  || user.Country == ""  || user.Bio == "" {
-	// 	fmt.Println("im here")
-	// 	return "Some data is missing", RepoErr
-	// }
 	collection := repo.db.Database(database).Collection(collection)
 	pwd := helpers.HashAndSalt([]byte(user.Password))
 	user.Password = pwd
-	fmt.Println("user", user)
+	// fmt.Println("user", user.Photo)
+	
 	insertResult, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
 		fmt.Printf("error type: %T", err)
@@ -88,12 +76,12 @@ func (repo *repo) UpdateUser(ctx context.Context, id string, user User) (string,
 	// return "", nil
 }
 
-func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error) {
+func (repo *repo) GetUser(ctx context.Context, id string) (bool, string, User, error) {
 	var user User
 	fmt.Println("id", id)
 	docID, _err := primitive.ObjectIDFromHex(id)
 	if _err != nil {
-		return "", "Wrong User id", nil
+		return false, "Wrong User id", user, nil
 	}
 	filter := bson.M{
 		"_id": docID,
@@ -104,9 +92,9 @@ func (repo *repo) GetUser(ctx context.Context, id string) (string, string, error
 		// Email not found
 		// RepoErr difficult to handle
 		// return "", "User not found", err 
-		return "", "User not found", nil
+		return false, "User not found", user, nil
 	}
-	return user.Email, "User found", nil
+	return true, "User found", user, nil
 }
 
 func (repo *repo) DeleteUser(ctx context.Context, id string) (string, error) {
@@ -127,12 +115,12 @@ func (repo *repo) DeleteUser(ctx context.Context, id string) (string, error) {
 	return "Success", nil
 }
 
-func (repo *repo) GetUserLogin(ctx context.Context, email string, password string) (string, string, error) {
+func (repo *repo) GetUserLogin(ctx context.Context, email string, password string) (string, string, User, bool, error) {
 	var user User
 	// var token string
-	if email == "" || password == "" {
-		return email, "", RepoErr
-	}
+	// if email == "" || password == "" {
+	// 	return email, "", RepoErr
+	// }
 	filter := bson.M{
 		"email": email,
 	}
@@ -140,12 +128,12 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 	err := collection.FindOne(context.Background(), filter).Decode(&user)
 	if err != nil {
 		// Email not found
-		return email, "", nil
+		return email, "", user, false, nil
 	}
 	pwdMatch := helpers.ComparePasswords(user.Password, []byte(password))
 	if pwdMatch == false {
 		// Invalid login credentials. Please try again
-		return email, "", nil
+		return email, "", user, false, nil
 	}
 	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
 
@@ -161,10 +149,10 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 	tokenString, error := token.SignedString([]byte("secret"))
 	if error != nil {
 		// something went wrong
-		return email, "", nil
+		return email, "", user, false, nil
 	}
 
 	fmt.Println("tokenString", tokenString)
     // succesful login
-	return email, tokenString, nil
+	return email, tokenString, user, true, nil
 }

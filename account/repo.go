@@ -18,8 +18,8 @@ import (
 var RepoErr = errors.New("Unable to handle Repo Request")
 const (
 	database   = "buddyApp"
-	collection = "goUsers"
-	collectionToken = "goTokens"
+	collectionUsers = "goUsers"
+	collectionTokens = "goTokens"
 )
 type repo struct {
 	db     *mongo.Client
@@ -35,7 +35,7 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 
 
 func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User, error) {
-	collection := repo.db.Database(database).Collection(collection)
+	collection := repo.db.Database(database).Collection(collectionUsers)
 	pwd := helpers.HashAndSalt([]byte(user.Password))
 	user.Password = pwd
 	insertResult, err := collection.InsertOne(context.TODO(), user)
@@ -62,7 +62,7 @@ func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User
 	}	
 	// expiresAt := time.Now().Add(time.Minute * 100000).Unix()
 	// TODO env variable
-	collectionToken := repo.db.Database(database).Collection(collectionToken)
+	collectionToken := repo.db.Database(database).Collection(collectionTokens)
 	insertTokenResult, err := collectionToken.InsertOne(context.TODO(), tk)
 	if err != nil {
 		return false, "Could not save a token", user, nil
@@ -79,7 +79,7 @@ func (repo *repo) UpdateUser(ctx context.Context, id string, user User) (string,
 		"id": id,
 	}
 	update := bson.M{"$set": bson.M{"email": user.Email}}
-	collection := repo.db.Database(database).Collection(collection)
+	collection := repo.db.Database(database).Collection(collectionUsers)
 	result, err := collection.UpdateOne(
         ctx,
         filter,
@@ -108,7 +108,7 @@ func (repo *repo) GetUser(ctx context.Context, id string) (bool, string, User, e
 	filter := bson.M{
 		"_id": docID,
 	}
-	collection := repo.db.Database(database).Collection(collection)
+	collection := repo.db.Database(database).Collection(collectionUsers)
 	err := collection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
 		// Email not found
@@ -127,7 +127,7 @@ func (repo *repo) DeleteUser(ctx context.Context, id string) (string, error) {
 	filter := bson.M{
 		"_id": docID,
 	}
-	collection := repo.db.Database(database).Collection(collection)
+	collection := repo.db.Database(database).Collection(collectionUsers)
 	res, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		// Email not found
@@ -146,7 +146,7 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 	filter := bson.M{
 		"email": email,
 	}
-	collection := repo.db.Database(database).Collection(collection)
+	collection := repo.db.Database(database).Collection(collectionUsers)
 	err := collection.FindOne(context.Background(), filter).Decode(&user)
 	if err != nil {
 		// Email not found

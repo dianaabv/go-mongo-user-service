@@ -14,10 +14,12 @@ import (
 	"syscall"
 	"gokit-example/account"
 	"gokit-example/activity"
+	"gokit-example/account/config"
 	"go.mongodb.org/mongo-driver/mongo"
     // "go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/bson"
+	"github.com/joho/godotenv"
 )
 
 // TODO os.Getenv
@@ -31,7 +33,21 @@ const (
 	password   = "abc123"
 	collection = "goUsers"
 )
+func init() {
+    // loads values from .env into the system
+    if err := godotenv.Load(); err != nil {
+        fmt.Print("No .env file found")
+    }
+}
 func main() {
+	// defaultPort, exists := os.LookupEnv("DEFAULT_PORT")
+
+    // if exists {
+	// fmt.Println(defaultPort)
+	// }
+	conf := config.New()
+	fmt.Println(conf.Database.DBSource)
+
 	var httpAddr = flag.String("http", ":" + defaultPort, "http listen address")
 	var logger log.Logger
 	{

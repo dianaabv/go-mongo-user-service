@@ -11,16 +11,19 @@ import (
 	"gokit-example/account/helpers"
 	"time"
 	"go.mongodb.org/mongo-driver/bson/primitive" // for BSON ObjectID
-
-	// "go.mongodb.org/mongo-driver/mongo"
+	"gokit-example/account/config"
 )
+
 
 var RepoErr = errors.New("Unable to handle Repo Request")
+
 const (
 	database   = "buddyApp"
-	collectionUsers = "goUsers"
-	collectionTokens = "goTokens"
+	collectionUsers = "sys_users"
+	collectionTokens = "sys_tokens"
 )
+
+
 type repo struct {
 	db     *mongo.Client
 	logger log.Logger
@@ -33,8 +36,9 @@ func NewRepo(db *mongo.Client, logger log.Logger) Repository {
 	}
 }
 
-
 func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User, error) {
+	// for env varibales
+	conf := config.New()
 	collection := repo.db.Database(database).Collection(collectionUsers)
 	pwd := helpers.HashAndSalt([]byte(user.Password))
 	user.Password = pwd
@@ -47,7 +51,7 @@ func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User
 	}
 	tk := &Token{}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	tokenString, error := token.SignedString([]byte("secret"))
+	tokenString, error := token.SignedString([]byte(conf.Jwtsecret.SecretKey))
 	if error != nil {
 		return false, "Could not create a token", user, nil
 	}
@@ -139,7 +143,7 @@ func (repo *repo) DeleteUser(ctx context.Context, id string) (string, error) {
 
 func (repo *repo) GetUserLogin(ctx context.Context, email string, password string) (string, string, User, bool, error) {
 	var user User
-	// var token string
+	conf := config.New()
 	// if email == "" || password == "" {
 	// 	return email, "", RepoErr
 	// }
@@ -167,14 +171,11 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 		},
 	}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
-	// TODO env variable
-	tokenString, error := token.SignedString([]byte("secret"))
+	tokenString, error := token.SignedString([]byte(conf.Jwtsecret.SecretKey))
 	if error != nil {
 		// something went wrong
 		return email, "", user, false, nil
 	}
-
 	fmt.Println("tokenString", tokenString)
-    // succesful login
 	return email, tokenString, user, true, nil
 }

@@ -7,16 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-kit/kit/log"
-
-	// "github.com/dgrijalva/jwt-go"
-	// "gokit-example/account/helpers"
-	// "time"
 )
 
 var RepoErr = errors.New("Unable to handle Repo Request")
 const (
 	database   = "buddyApp"
-	collection = "goActivities"
+	collection = "sys_activities"
 )
 type repo struct {
 	db     *mongo.Client

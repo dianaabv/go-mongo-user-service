@@ -23,16 +23,16 @@ import (
 )
 
 // TODO os.Getenv
-const (
-	defaultPort = "8080"
-	dbsource = "mongodb://localhost:27017"
-	dbsourcewithcred = "mongodb://admin:abc123@localhost:27017"
-	hosts      = "localhost:27017"
-	database   = "buddyApp"
-	username   = "admin"
-	password   = "abc123"
-	collection = "goUsers"
-)
+// const (
+// 	defaultPort = "8080"
+// 	dbsource = "mongodb://localhost:27017"
+// 	dbsourcewithcred = "mongodb://admin:abc123@localhost:27017"
+// 	hosts      = "localhost:27017"
+// 	database   = "buddyApp"
+// 	username   = "admin"
+// 	password   = "abc123"
+// 	collection = "goUsers"
+// )
 func init() {
     // loads values from .env into the system
     if err := godotenv.Load(); err != nil {
@@ -40,15 +40,8 @@ func init() {
     }
 }
 func main() {
-	// defaultPort, exists := os.LookupEnv("DEFAULT_PORT")
-
-    // if exists {
-	// fmt.Println(defaultPort)
-	// }
 	conf := config.New()
-	fmt.Println(conf.Database.DBSource)
-
-	var httpAddr = flag.String("http", ":" + defaultPort, "http listen address")
+	var httpAddr = flag.String("http", ":" + conf.AppConfig.Defaultport, "http listen address")
 	var logger log.Logger
 	{
 		logger = log.NewLogfmtLogger(os.Stderr)
@@ -63,8 +56,7 @@ func main() {
 	level.Info(logger).Log("msg", "service started")
 	defer level.Info(logger).Log("msg", "service ended")
 
-	clientOptions := options.Client().ApplyURI(dbsource)
-
+	clientOptions := options.Client().ApplyURI(conf.Database.DBSource)
     // Connect to MongoDB 
     db, err := mongo.Connect(context.TODO(), clientOptions)
 
@@ -83,7 +75,7 @@ func main() {
 	opt := options.Index()
 	opt.SetUnique(true)
 	index := mongo.IndexModel{Keys: bson.M{"email": 1}, Options: opt}
-	coll := db.Database(database).Collection(collection)
+	coll := db.Database(conf.Database.Database).Collection(conf.Database.CollectionUsers)
 	if _, err := coll.Indexes().CreateOne(ctx, index); err != nil {
 	  fmt.Println("Could not create index:", err)
 	}
@@ -128,11 +120,9 @@ func main() {
 }
 func accessControl(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// r.ParseForm()
-		// fmt.Printf(r.FormValue("bio"))
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "*")
-		// w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 
 		if r.Method == "OPTIONS" {
 			return

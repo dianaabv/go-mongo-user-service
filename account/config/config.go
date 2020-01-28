@@ -2,12 +2,13 @@ package config
 
 import (
     "os"
-    // "strconv"
-    // "strings"
 )
 
+type AppConfig struct {
+	Defaultport string
+}
 type DatabaseConfig struct {
-    Defaultport string
+    // Defaultport string
 	DBSource   string
 	DBSourceWithCred string
 	Hosts string
@@ -16,6 +17,7 @@ type DatabaseConfig struct {
 	Database string
 	CollectionUsers string
 	CollectionTokens string
+	CollectionActivities string
 }
 
 type JWTConfig struct {
@@ -23,17 +25,18 @@ type JWTConfig struct {
 }
 
 type Config struct {
+	AppConfig AppConfig
     Database    DatabaseConfig
     Jwtsecret JWTConfig
-    // UserRoles []string
-    // MaxUsers  int
 }
 
 // New returns a new Config struct
 func New() *Config {
     return &Config{
-	Database: DatabaseConfig{
+	AppConfig: AppConfig {
 	    Defaultport: getEnv("DEFAULT_PORT", ""),
+	},
+	Database: DatabaseConfig{
 		DBSource:   getEnv("DB_SOURCE", ""),
 		DBSourceWithCred:   getEnv("DB_SOURCE_WITH_CRED", ""),
 		Hosts:   getEnv("HOSTS", ""),
@@ -42,13 +45,11 @@ func New() *Config {
 		Database:   getEnv("DATABASE", ""),
 		CollectionUsers:   getEnv("COLLECTION_USERS", ""),
 		CollectionTokens:   getEnv("COLLECTION_TOKENS", ""),
+		CollectionActivities:  getEnv("COLLECTION_ACTIVITIES", ""),
 	},
 	Jwtsecret: JWTConfig{
 		SecretKey:   getEnv("SECRETKEY", ""),
 	},
-	// DebugMode: getEnvAsBool("DEBUG_MODE", true),
-	// UserRoles: getEnvAsSlice("USER_ROLES", []string{"admin"}, ","),
-	// MaxUsers:  getEnvAsInt("MAX_USERS", 1),
     }
 }
 
@@ -60,36 +61,3 @@ func getEnv(key string, defaultVal string) string {
 
     return defaultVal
 }
-
-// Simple helper function to read an environment variable into integer or return a default value
-// func getEnvAsInt(name string, defaultVal int) int {
-//     valueStr := getEnv(name, "")
-//     if value, err := strconv.Atoi(valueStr); err == nil {
-// 	return value
-//     }
-
-//     return defaultVal
-// }
-
-// Helper to read an environment variable into a bool or return default value
-// func getEnvAsBool(name string, defaultVal bool) bool {
-//     valStr := getEnv(name, "")
-//     if val, err := strconv.ParseBool(valStr); err == nil {
-// 	return val
-//     }
-
-//     return defaultVal
-// }
-
-// Helper to read an environment variable into a string slice or return default value
-// func getEnvAsSlice(name string, defaultVal []string, sep string) []string {
-//     valStr := getEnv(name, "")
-
-//     if valStr == "" {
-// 	return defaultVal
-//     }
-
-//     val := strings.Split(valStr, sep)
-
-//     return val
-// }

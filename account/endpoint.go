@@ -23,9 +23,6 @@ func MakeEndpoints(s Service) Endpoints {
 		UpdateUser : makeUpdateUserEndpoint(s),
 	}
 }
-// func (user User) IsStructureEmpty() bool {
-// 	return reflect.DeepEqual(user, User{})
-// }
 
 func makeCreateUserEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {

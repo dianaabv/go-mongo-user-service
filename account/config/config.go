@@ -6,6 +6,7 @@ import (
 
 type AppConfig struct {
 	Defaultport string
+	Appname string
 }
 type MailingConfig struct {
 	Host string

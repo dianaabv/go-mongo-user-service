@@ -10,16 +10,16 @@ import (
 func MailCenter(to string) bool {
 	conf := config.New()
 	htmlBody :=
-`<html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>Hello Gophers!</title>
-	</head>
-	<body>
-		<p>This is the <b>Go gopher</b>.</p>
-		<p>Image created by Renee French</p>
-	</body>
-</html>`
+	`<html>
+		<head>
+			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+			<title>Hello Gophers!</title>
+		</head>
+		<body>
+			<p>This is the <b>Go gopher</b>.</p>
+			<p>Image created by Renee French</p>
+		</body>
+	</html>`
 
 	server := mail.NewSMTPClient()
 	server.Host = conf.Mailing.Host
@@ -28,14 +28,6 @@ func MailCenter(to string) bool {
 	server.Username =  conf.Mailing.Username
 	server.Password = conf.Mailing.Password
 	server.Encryption = mail.EncryptionTLS
-
-	/*
-	In version >=2.3.0 you can specified authentication type: PLAIN, LOGIN, CRAM-MD5
-	if not specified, default is mail.AuthPlain
-
-	code:
-	server.Authentication = mail.AuthPlain
-	*/
 	
 	//Variable to keep alive connection
 	server.KeepAlive = false
@@ -61,8 +53,6 @@ func MailCenter(to string) bool {
 		SetSubject("New Go Email")
 
 	email.SetBody(mail.TextHTML, htmlBody)
-
-	// email.AddInline("/path/to/image.png", "Gopher.png")
 
 	//Call Send and pass the client
 	err = email.Send(smtpClient)

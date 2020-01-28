@@ -22,14 +22,6 @@ func MailCenter(to string) bool {
 </html>`
 
 	server := mail.NewSMTPClient()
-	
-	//SMTP Server
-	// server.Host = "smtp.example.com"
-	// server.Port = 587
-	// server.Username = "test@example.com"
-	// server.Password = "examplepass"
-	// server.Encryption = mail.EncryptionTLS
-
 	server.Host = conf.Mailing.Host
 	// TODO better solution
 	server.Port = 587
@@ -65,7 +57,7 @@ func MailCenter(to string) bool {
 	email := mail.NewMSG()
 
 	email.SetFrom(server.Username).
-		AddTo("test@gmail.com").
+		AddTo(to).
 		SetSubject("New Go Email")
 
 	email.SetBody(mail.TextHTML, htmlBody)

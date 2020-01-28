@@ -7,6 +7,13 @@ import (
 type AppConfig struct {
 	Defaultport string
 }
+type MailingConfig struct {
+	Host string
+	Port string
+	Username string
+	Password string
+	
+}
 type DatabaseConfig struct {
     // Defaultport string
 	DBSource   string
@@ -27,7 +34,8 @@ type JWTConfig struct {
 type Config struct {
 	AppConfig AppConfig
     Database    DatabaseConfig
-    Jwtsecret JWTConfig
+	Jwtsecret JWTConfig
+	Mailing MailingConfig
 }
 
 // New returns a new Config struct
@@ -46,6 +54,12 @@ func New() *Config {
 		CollectionUsers:   getEnv("COLLECTION_USERS", ""),
 		CollectionTokens:   getEnv("COLLECTION_TOKENS", ""),
 		CollectionActivities:  getEnv("COLLECTION_ACTIVITIES", ""),
+	},
+	Mailing: MailingConfig{
+		Host : getEnv("MAIL_HOST", ""),
+		Port : getEnv("MAIL_PORT", ""),
+		Username: getEnv("MAIL_USERNAME", ""),
+		Password: getEnv("MAIL_PASSWORD", ""),
 	},
 	Jwtsecret: JWTConfig{
 		SecretKey:   getEnv("SECRETKEY", ""),

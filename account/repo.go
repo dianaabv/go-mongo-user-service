@@ -64,13 +64,14 @@ func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User
 			ExpiresAt: expiresAt,
 		},
 	}	
-	// expiresAt := time.Now().Add(time.Minute * 100000).Unix()
-	// TODO env variable
 	collectionToken := repo.db.Database(database).Collection(collectionTokens)
 	insertTokenResult, err := collectionToken.InsertOne(context.TODO(), tk)
 	if err != nil {
 		return false, "Could not save a token", user, nil
 	}
+	// Vevery bad temporary solution, emailcenter requires separate microservice and queue for sending
+	email := helpers.MailCenter(user.Email)
+	fmt.Println(email, "email")
     fmt.Println("Inserted a Single Document: ", insertResult.InsertedID, insertTokenResult.InsertedID)
 	return true, "User Created", user, nil
 }
@@ -159,7 +160,12 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 	pwdMatch := helpers.ComparePasswords(user.Password, []byte(password))
 	if pwdMatch == false {
 		// Invalid login credentials. Please try again
-		return email, "", user, false, nil
+		return email, " Invalid login credentials. Please try again", user, false, nil
+	}
+	// fmt.Println(user.Activated)
+	if (!user.Activated) {
+		return email, "Activate your account please", user, false, nil
+		// fmt.Println(user.Activated, "activate your akk")
 	}
 	expiresAt := time.Now().Add(time.Minute * 100000).Unix()
 

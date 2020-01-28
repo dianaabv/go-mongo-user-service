@@ -22,17 +22,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// TODO os.Getenv
-// const (
-// 	defaultPort = "8080"
-// 	dbsource = "mongodb://localhost:27017"
-// 	dbsourcewithcred = "mongodb://admin:abc123@localhost:27017"
-// 	hosts      = "localhost:27017"
-// 	database   = "buddyApp"
-// 	username   = "admin"
-// 	password   = "abc123"
-// 	collection = "goUsers"
-// )
 func init() {
     // loads values from .env into the system
     if err := godotenv.Load(); err != nil {

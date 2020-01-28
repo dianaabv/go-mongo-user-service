@@ -5,22 +5,35 @@ import (
 	"log"
 	"time"
 	"gokit-example/account/config"
+	"html/template"
+	"bytes"
+	// "fmt"
+	// "os"
 )
+
+func ParseTemplate(templateFileName string, data interface{}) (string, error) {
+	t, err := template.ParseFiles(templateFileName)
+	if err != nil {
+		return "", err
+	}
+	buf := new(bytes.Buffer)
+	if err = t.Execute(buf, data); err != nil {
+		return "", err
+	}
+	// body = buf.String()
+	return buf.String(), nil
+}
 
 func MailCenter(to string) bool {
 	conf := config.New()
-	htmlBody :=
-	`<html>
-		<head>
-			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<title>Hello Gophers!</title>
-		</head>
-		<body>
-			<p>This is the <b>Go gopher</b>.</p>
-			<p>Image created by Renee French</p>
-		</body>
-	</html>`
-
+	templateData := struct {
+		Name   string
+		Token  string
+	}{
+		Name: "Dhanush",
+		Token:  "http://geektrust.in",
+	}
+	template, err := ParseTemplate("templates/registration.html", templateData)
 	server := mail.NewSMTPClient()
 	server.Host = conf.Mailing.Host
 	// TODO better solution
@@ -52,7 +65,7 @@ func MailCenter(to string) bool {
 		AddTo(to).
 		SetSubject("New Go Email")
 
-	email.SetBody(mail.TextHTML, htmlBody)
+	email.SetBody(mail.TextHTML, template)
 
 	//Call Send and pass the client
 	err = email.Send(smtpClient)
@@ -64,4 +77,5 @@ func MailCenter(to string) bool {
 		log.Println("Email Sent")
 		return true
 	}
+	return true
 }

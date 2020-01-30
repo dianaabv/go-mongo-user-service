@@ -24,14 +24,14 @@ func ParseTemplate(templateFileName string, data interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-func MailCenter(to string) bool {
+func MailCenter(to string, name string, token string) bool {
 	conf := config.New()
 	templateData := struct {
 		Name   string
 		Token  string
 	}{
-		Name: "Dhanush",
-		Token:  "http://geektrust.in",
+		Name: name,
+		Token:  conf.AppConfig.ApiUrl + "/account/v1/verify/" + token,
 	}
 	template, err := ParseTemplate("templates/registration.html", templateData)
 	server := mail.NewSMTPClient()
@@ -77,5 +77,5 @@ func MailCenter(to string) bool {
 		log.Println("Email Sent")
 		return true
 	}
-	return true
+	// return true
 }

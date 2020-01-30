@@ -7,6 +7,7 @@ import (
 type AppConfig struct {
 	Defaultport string
 	Appname string
+	ApiUrl string
 }
 type MailingConfig struct {
 	Host string
@@ -43,7 +44,8 @@ type Config struct {
 func New() *Config {
     return &Config{
 	AppConfig: AppConfig {
-	    Defaultport: getEnv("DEFAULT_PORT", ""),
+		Defaultport: getEnv("DEFAULT_PORT", ""),
+		ApiUrl: getEnv("API_URL", ""),
 	},
 	Database: DatabaseConfig{
 		DBSource:   getEnv("DB_SOURCE", ""),

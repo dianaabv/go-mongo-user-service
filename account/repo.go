@@ -70,7 +70,7 @@ func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User
 		return false, "Could not save a token", user, nil
 	}
 	// Vevery bad temporary solution, emailcenter requires separate microservice and queue for sending
-	email := helpers.MailCenter(user.Email)
+	email := helpers.MailCenter(user.Email, user.Name, tokenString)
 	fmt.Println(email, "email")
     fmt.Println("Inserted a Single Document: ", insertResult.InsertedID, insertTokenResult.InsertedID)
 	return true, "User Created", user, nil

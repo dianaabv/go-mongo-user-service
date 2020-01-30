@@ -123,7 +123,33 @@ func (repo *repo) GetUser(ctx context.Context, id string) (bool, string, User, e
 	}
 	return true, "User found", user, nil
 }
-
+func (repo *repo) VerifyUser(ctx context.Context, token string, email string) (bool, error) {
+	var tk Token
+	filter := bson.M{
+		"token": token,
+		"email": email,
+	}
+	collection := repo.db.Database(database).Collection(collectionTokens)
+	err := collection.FindOne(ctx, filter).Decode(&tk)
+	if err != nil {
+		return false, err
+	}
+	filterUser := bson.M{
+		"email": email,
+	}
+	update := bson.M{"$set": bson.M{"activated": true}}
+	collectionUs:= repo.db.Database(database).Collection(collectionUsers)
+	result, err := collectionUs.UpdateOne(
+        ctx,
+        filterUser,
+        update,
+	)
+	if result.MatchedCount == 1 {
+		return true, nil
+	} else {
+		return false, nil
+	}
+}
 func (repo *repo) DeleteUser(ctx context.Context, id string) (string, error) {
 	docID, _err := primitive.ObjectIDFromHex(id)
 	if _err != nil {

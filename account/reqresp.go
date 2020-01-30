@@ -38,6 +38,13 @@ type (
 	GetUserRequest struct {
 		Id string `json:"id"`
 	}
+	VerifyUserRequest struct {
+		Token string `json:"token"`
+		Email string `json:"email"`
+	}
+	VerifyUserResponse struct {
+		Ok bool `json:"ok"`
+	}
 	GetUserResponse struct {
 		Ok bool `json:"ok"`
 		Message string `json:"message"`
@@ -81,30 +88,10 @@ func decodeUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 
 	err := json.NewDecoder(r.Body).Decode(&req)
 
-	//photo file logic
-	// file, handler, err := r.FormFile("photo")
-    // if err != nil {
-    //     fmt.Println("Error Retrieving the File")
-    //     fmt.Println(err)
-    //     //return
-	// }
-	// defer file.Close()
-    // fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-	// fmt.Printf("File Size: %+v\n", handler.Size)
-	//  // byte array
-	// fileBytes, err := ioutil.ReadAll(file)
-	// if err != nil {
-	//     fmt.Println(err)
-	// }
-	// req.Photo = fileBytes
 	if err != nil {
 		return nil, err
 	}
 	return req, nil
-
-	// fmt.Printf(r.FormValue("bio"))
-	// var req = r.ParseForm()
-	// return req, nil
 }
 func decodeUpdateUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req UpdateUserRequest
@@ -130,6 +117,16 @@ func decodeEmailReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
+func decodeVerifyUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req VerifyUserRequest
+	vars := mux.Vars(r)
+
+	req = VerifyUserRequest{
+		Token: vars["token"],
+		Email: vars["email"],
+	}
+	return req, nil
+}
 func decodeUserLoginReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req CreateUserLoginRequest
 	// var res CreateUserLoginResponse

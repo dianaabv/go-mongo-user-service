@@ -12,4 +12,5 @@ type Repository interface {
 	DeleteUser(cts context.Context, id string) (string, error) 
 	GetUserLogin(ctx context.Context, email string, password string) (string, string, User, bool, error)
 	UpdateUser(ctx context.Context, id string, user User) (string, error)
+	VerifyUser(ctx context.Context, token string, email string) (bool, error)
 }

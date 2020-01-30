@@ -31,7 +31,7 @@ func MailCenter(to string, name string, token string) bool {
 		Token  string
 	}{
 		Name: name,
-		Token:  conf.AppConfig.ApiUrl + "/account/v1/verify/" + token,
+		Token:  conf.AppConfig.ApiUrl + "/account/v1/verify/" + token + "/" + to,
 	}
 	template, err := ParseTemplate("templates/registration.html", templateData)
 	server := mail.NewSMTPClient()

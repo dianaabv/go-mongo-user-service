@@ -12,6 +12,7 @@ type Endpoints struct {
 	UserLogin  endpoint.Endpoint
 	DeleteUser endpoint.Endpoint
 	UpdateUser endpoint.Endpoint
+	VerifyUser endpoint.Endpoint
 }
 
 func MakeEndpoints(s Service) Endpoints {
@@ -21,6 +22,7 @@ func MakeEndpoints(s Service) Endpoints {
 		UserLogin  : makeGetUserLoginEndpoint(s),
 		DeleteUser : makeDeleteUserEndpoint(s),
 		UpdateUser : makeUpdateUserEndpoint(s),
+		VerifyUser : makeVerifyUserEndpoint(s),
 	}
 }
 
@@ -66,6 +68,17 @@ func makeGetUserEndpoint(s Service) endpoint.Endpoint {
 			Ok: ok,
 			Message: message,
 			Respuser: user,
+		}, err
+	}
+}
+
+func makeVerifyUserEndpoint(s Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(VerifyUserRequest)
+		ok, err := s.VerifyUser(ctx, req.Token, req.Email)
+		fmt.Println(err)
+		return VerifyUserResponse{
+			Ok: ok,
 		}, err
 	}
 }

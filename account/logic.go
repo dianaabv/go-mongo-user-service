@@ -60,6 +60,20 @@ func (s service) GetUser(ctx context.Context, id string) (bool, string, User, er
 
 	return ok, message, user, nil
 }
+func (s service) VerifyUser(ctx context.Context, token string, email string) (bool, error) {
+	logger := log.With(s.logger, "method", "GetUser")
+
+	ok, err := s.repostory.VerifyUser(ctx, token, email)
+	if err != nil {
+		level.Error(logger).Log("err", err)
+		return ok, err
+		// return "", message, err
+	}
+
+	logger.Log("Get user", email, token)
+
+	return ok, nil
+}
 
 func (s service) DeleteUser(ctx context.Context, id string) (string, error) {
 	logger := log.With(s.logger, "method", "DeleteUser")

@@ -10,5 +10,6 @@ type Service interface {
 	GetUserLogin(ctx context.Context, email string, password string) (string, string, User, bool, error)
 	// UpdateUser(ctx context.Context, id string, user User) (string, error)
 	UpdateUser(ctx context.Context, id string, email string, password string) (string, error)
+	VerifyUser(ctx context.Context, token string, email string) (bool, error)
 }
 

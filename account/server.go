@@ -41,7 +41,11 @@ func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
 		decodeEmailReq,
 		encodeResponse,
 	))
-	
+	r.Methods("GET").Path("/account/v1/verify/{token}/{email}").Handler(httptransport.NewServer(
+		endpoints.VerifyUser,
+		decodeVerifyUserReq,
+		encodeResponse,
+	))
 	// Auth route
 	s := r.PathPrefix("/account/v1/auth").Subrouter()
 	s.Use(helpers.JwtVerify)

@@ -211,3 +211,31 @@ func (repo *repo) GetUserLogin(ctx context.Context, email string, password strin
 	fmt.Println("tokenString", tokenString)
 	return email, tokenString, user, true, nil
 }
+
+func (repo *repo) RepeatVerifyUser(ctx context.Context, email string) (bool, string, error) {
+	conf := config.New()
+	tk := &Token{}
+	newToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, error := newToken.SignedString([]byte(conf.Jwtsecret.SecretKey))
+	if error != nil {
+		return false, "Something went wront.", nil
+	}
+	filterUser := bson.M{
+		"email": email,
+	}
+	update := bson.M{"$set": bson.M{"token": tokenString}}
+	collectionTk:= repo.db.Database(database).Collection(collectionTokens)
+	result, err := collectionTk.UpdateOne(
+        ctx,
+        filterUser,
+        update,
+	)
+	if result.MatchedCount == 1 {
+		email := helpers.MailCenter(email, "", tokenString)
+		fmt.Println(email, "email")
+		return true, "Success. Check your email", nil
+	} else {
+		return false, "E-mail is not registered", err
+	}
+	// return true, err
+}

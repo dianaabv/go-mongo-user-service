@@ -75,6 +75,13 @@ type (
 		Respuser User `json:"user"`
 		Ok 	  bool `json:"ok"`
 	}
+	RepeatVerifyUserRequest struct {
+		Email string `json:"email"`
+	}
+	RepeatVerifyUserResponse struct {
+		Ok bool `json:"Ok"`
+		Message string `json: "message"`
+	}
 )
 
 
@@ -117,6 +124,16 @@ func decodeEmailReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
+func decodeRepeatVerifyReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req RepeatVerifyUserRequest
+	vars := mux.Vars(r)
+
+	req = RepeatVerifyUserRequest{
+		Email: vars["email"],
+	}
+	return req, nil
+}
+
 func decodeVerifyUserReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req VerifyUserRequest
 	vars := mux.Vars(r)
@@ -127,6 +144,7 @@ func decodeVerifyUserReq(ctx context.Context, r *http.Request) (interface{}, err
 	}
 	return req, nil
 }
+
 func decodeUserLoginReq(ctx context.Context, r *http.Request) (interface{}, error) {
 	var req CreateUserLoginRequest
 	// var res CreateUserLoginResponse

@@ -100,3 +100,14 @@ func (s service) GetUserLogin(ctx context.Context, email string, password string
 
 	return email, token, user, ok, nil
 }
+
+func (s service ) RepeatVerifyUser(ctx context.Context, email string) (bool, string, error) {
+	logger := log.With(s.logger, "method", "RepeatVerifyUser")
+
+	ok, message, err := s.repostory.RepeatVerifyUser(ctx, email)
+	if err != nil {
+		level.Error(logger).Log("err", err)
+		return ok, message, err
+	}
+	return ok, message, err
+}

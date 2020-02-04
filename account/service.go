@@ -11,5 +11,6 @@ type Service interface {
 	// UpdateUser(ctx context.Context, id string, user User) (string, error)
 	UpdateUser(ctx context.Context, id string, email string, password string) (string, error)
 	VerifyUser(ctx context.Context, token string, email string) (bool, error)
+	RepeatVerifyUser(ctx context.Context, email string) (bool, string, error)
 }
 

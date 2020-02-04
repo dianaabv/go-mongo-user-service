@@ -111,3 +111,14 @@ func (s service ) RepeatVerifyUser(ctx context.Context, email string) (bool, str
 	}
 	return ok, message, err
 }
+
+func (s service) ForgotPassword(ctx context.Context, email string) (bool, string, error) {
+	logger := log.With(s.logger, "method", "ForgotPassword")
+
+	ok, message, err := s.repostory.ForgotPassword(ctx, email)
+	if err != nil {
+		level.Error(logger).Log("err", err)
+		return ok, message, err
+	}
+	return ok, message, err
+}

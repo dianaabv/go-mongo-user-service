@@ -14,4 +14,5 @@ type Repository interface {
 	UpdateUser(ctx context.Context, id string, user User) (string, error)
 	VerifyUser(ctx context.Context, token string, email string) (bool, error)
 	RepeatVerifyUser(ctx context.Context, email string) (bool, string, error)
+	ForgotPassword(ctx context.Context, email string) (bool, string, error)
 }

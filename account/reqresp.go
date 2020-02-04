@@ -82,6 +82,13 @@ type (
 		Ok bool `json:"Ok"`
 		Message string `json: "message"`
 	}
+	ForgotPasswordRequest struct {
+		Email string `json:"email"`
+	}
+	ForgotPasswordResponse struct {
+		Ok bool `json:"Ok"`
+		Message string `json: "message"`
+	}
 )
 
 
@@ -129,6 +136,15 @@ func decodeRepeatVerifyReq(ctx context.Context, r *http.Request) (interface{}, e
 	vars := mux.Vars(r)
 
 	req = RepeatVerifyUserRequest{
+		Email: vars["email"],
+	}
+	return req, nil
+}
+func decodeForgotPasswordReq(ctx context.Context, r *http.Request) (interface{}, error) {
+	var req ForgotPasswordRequest
+	vars := mux.Vars(r)
+
+	req = ForgotPasswordRequest{
 		Email: vars["email"],
 	}
 	return req, nil

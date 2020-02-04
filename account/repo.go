@@ -70,7 +70,7 @@ func (repo *repo) CreateUser(ctx context.Context, user User) (bool, string, User
 		return false, "Could not save a token", user, nil
 	}
 	// Vevery bad temporary solution, emailcenter requires separate microservice and queue for sending
-	email := helpers.MailCenter(user.Email, user.Name, tokenString)
+	email := helpers.MailCenter(user.Email, user.Name, "templates/registration.html", tokenString)
 	fmt.Println(email, "email")
     fmt.Println("Inserted a Single Document: ", insertResult.InsertedID, insertTokenResult.InsertedID)
 	return true, "User Created", user, nil
@@ -231,11 +231,39 @@ func (repo *repo) RepeatVerifyUser(ctx context.Context, email string) (bool, str
         update,
 	)
 	if result.MatchedCount == 1 {
-		email := helpers.MailCenter(email, "", tokenString)
+		email := helpers.MailCenter(email, "", "templates/registration.html", tokenString)
 		fmt.Println(email, "email")
 		return true, "Success. Check your email", nil
 	} else {
 		return false, "E-mail is not registered", err
 	}
-	// return true, err
+}
+
+// refine forgot password and email
+func (repo *repo) ForgotPassword(ctx context.Context, email string) (bool, string, error) {
+	conf := config.New()
+	tk := &Token{}
+	newToken := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
+	tokenString, error := newToken.SignedString([]byte(conf.Jwtsecret.SecretKey))
+	if error != nil {
+		return false, "Something went wront.", nil
+	}
+	filterUser := bson.M{
+		"email": email,
+	}
+	update := bson.M{"$set": bson.M{"token": tokenString}}
+	collectionTk:= repo.db.Database(database).Collection(collectionTokens)
+	result, err := collectionTk.UpdateOne(
+        ctx,
+        filterUser,
+        update,
+	)
+	if result.MatchedCount == 1 {
+		email := helpers.MailCenter(email, "", "templates/registration.html", tokenString)
+		fmt.Println(email, "email")
+		return true, "Check your email to change your password", nil
+	} else {
+		return false, "E-mail is not registered", err
+	}
+
 }

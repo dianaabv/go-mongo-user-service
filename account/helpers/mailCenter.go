@@ -24,7 +24,7 @@ func ParseTemplate(templateFileName string, data interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-func MailCenter(to string, name string, token string) bool {
+func MailCenter(to string, name string, pathToHtml string,token string) bool {
 	conf := config.New()
 	templateData := struct {
 		Name   string
@@ -33,7 +33,7 @@ func MailCenter(to string, name string, token string) bool {
 		Name: name,
 		Token:  conf.AppConfig.ApiUrl + "/account/v1/verify/" + token + "/" + to,
 	}
-	template, err := ParseTemplate("templates/registration.html", templateData)
+	template, err := ParseTemplate(pathToHtml, templateData)
 	server := mail.NewSMTPClient()
 	server.Host = conf.Mailing.Host
 	// TODO better solution
